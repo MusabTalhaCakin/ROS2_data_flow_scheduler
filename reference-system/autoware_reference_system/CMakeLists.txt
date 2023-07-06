@@ -24,7 +24,7 @@ find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
 
-find_package(centralized_data_flow_scheduler REQUIRED)
+find_package(data_flow_scheduler REQUIRED)
 
 # Number Cruncher Benchmark
 ament_auto_add_executable(number_cruncher_benchmark
@@ -42,13 +42,13 @@ if(${FRAMEWORK} STREQUAL ros)
   add_benchmark_executable(reference_system_dfsexecutor_interface_node
     src/ros2/executor/reference_system_dfsexecutor_interface_node.cpp)
 
-  ament_target_dependencies(autoware_dfs_executor centralized_data_flow_scheduler)
+  ament_target_dependencies(autoware_dfs_executor data_flow_scheduler)
   ament_target_dependencies(reference_system_dfsexecutor_interface_node 
-    centralized_data_flow_scheduler)
+    data_flow_scheduler)
     
-  target_link_libraries(autoware_dfs_executor centralized_data_flow_scheduler::data_flow_executor)
+  target_link_libraries(autoware_dfs_executor data_flow_scheduler::data_flow_executor)
   target_link_libraries(reference_system_dfsexecutor_interface_node 
-    centralized_data_flow_scheduler::data_flow_executor)
+    data_flow_scheduler::data_flow_executor)
 
   # Single Threaded Executor
   add_benchmark_executable(autoware_default_singlethreaded

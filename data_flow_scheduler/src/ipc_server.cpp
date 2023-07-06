@@ -1,4 +1,4 @@
-#include "centralized_data_flow_scheduler/ipc_server.h"
+#include "data_flow_scheduler/ipc_server.h"
 
 using namespace DFS;
 

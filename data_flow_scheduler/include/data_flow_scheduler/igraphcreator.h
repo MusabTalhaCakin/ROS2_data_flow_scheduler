@@ -6,7 +6,7 @@
 #ifndef IGRAPHCREATOR_H
 #define IGRAPHCREATOR_H
 
-#include "centralized_data_flow_scheduler/data_flow_types.h"
+#include "data_flow_scheduler/data_flow_types.h"
 #include <lemon/list_graph.h>
 
 namespace DFS
@@ -14,7 +14,7 @@ namespace DFS
 
   /**
    * @class IGraphCreator
-   * @brief Interface class for graph creation in the Centralized Platform Activity Sequencer.
+   * @brief Interface class for graph creation in the Platform Activity Sequencer.
    */
   class IGraphCreator
   {

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(centralized_data_flow_scheduler)
+project(data_flow_scheduler)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -49,7 +49,7 @@ ament_target_dependencies(template_node rclcpp std_msgs rosgraph_msgs)
 add_dependencies(template_node data_flow_executor) 
 
 install(
-  DIRECTORY include/centralized_data_flow_scheduler
+  DIRECTORY include/data_flow_scheduler
   DESTINATION include
 )
  

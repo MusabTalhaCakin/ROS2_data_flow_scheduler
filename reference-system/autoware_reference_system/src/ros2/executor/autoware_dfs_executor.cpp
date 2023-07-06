@@ -8,7 +8,7 @@
 #include "autoware_reference_system/autoware_system_builder.hpp"
 #include "autoware_reference_system/system/timing/benchmark.hpp"
 #include "autoware_reference_system/system/timing/default.hpp"
-#include "centralized_data_flow_scheduler/data_flow_executor.h"
+#include "data_flow_scheduler/data_flow_executor.h"
 
 void sensor_node_DFSExecutor(
     const std::vector<std::shared_ptr<rclcpp::Node>> &nodes,
@@ -155,7 +155,7 @@ void command_node_DFSExecutor(
 
 int main(int argc, char *argv[])
 {
-    // Testing the centralized data flow scheduler on the Autoware reference system.
+    // Testing the data flow scheduler on the Autoware reference system.
 
     rclcpp::init(argc, argv);
     using TimeConfig = nodes::timing::Default;

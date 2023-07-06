@@ -6,9 +6,9 @@
 #ifndef DFS_HASHT_H
 #define DFS_HASHT_H
 
-#include "centralized_data_flow_scheduler/data_flow_types.h"
-#include "centralized_data_flow_scheduler/data_flow_hashT.h"
-#include "centralized_data_flow_scheduler/igraphcreator.h"
+#include "data_flow_scheduler/data_flow_types.h"
+#include "data_flow_scheduler/data_flow_hashT.h"
+#include "data_flow_scheduler/igraphcreator.h"
 
 namespace DFS
 {

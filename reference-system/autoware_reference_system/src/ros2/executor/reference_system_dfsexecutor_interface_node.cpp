@@ -6,12 +6,12 @@
 #include "rclcpp/rclcpp.hpp"
 #include "reference_system/system/type/rclcpp_system.hpp"
 #include "autoware_reference_system/autoware_system_builder.hpp"
-#include "centralized_data_flow_scheduler/data_flow_executor.h"
+#include "data_flow_scheduler/data_flow_executor.h"
 
 int main(int argc, char *argv[])
 {
-  // Testing the Autoware reference system with the centralized data flow scheduler on multiple processes
-  // run the "/centralized_data_flow_scheduler/launch/autoware_reference_system_launch.py"
+  // Testing the Autoware reference system with the data flow scheduler on multiple processes
+  // run the "/data_flow_scheduler/launch/autoware_reference_system_launch.py"
   rclcpp::init(argc, argv);
 
   int nt = (argc > 1) ? atoi(argv[1]) : 1;

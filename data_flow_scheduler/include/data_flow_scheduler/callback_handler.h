@@ -6,7 +6,7 @@
 #ifndef CALLBACK_HANDLER_H
 #define CALLBACK_HANDLER_H
 
-#include "centralized_data_flow_scheduler/data_flow_types.h"
+#include "data_flow_scheduler/data_flow_types.h"
 
 namespace DFS_Interface
 {
@@ -53,7 +53,7 @@ namespace DFS_Interface
               const TimerInfoVector);
 
     /**
-     * @brief Handles a subscription request from the Centralized Data Flow Scheduler.
+     * @brief Handles a subscription request from the Data Flow Scheduler.
      * @return True if the subscription request is handled successfully, false otherwise.
      */
     bool subscription_handle(const char *, const char *,

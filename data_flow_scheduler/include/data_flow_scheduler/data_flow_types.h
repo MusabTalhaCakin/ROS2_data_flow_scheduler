@@ -4,7 +4,7 @@
  ******************************************************************************/
 /**
  * @file dfstypes.h
- * @brief This file contains some define values and the data types used in the Centralized Data Flow Sequencer.
+ * @brief This file contains some define values and the data types used in the Data Flow Sequencer.
  */
 
 #ifndef DFSTYPES_H

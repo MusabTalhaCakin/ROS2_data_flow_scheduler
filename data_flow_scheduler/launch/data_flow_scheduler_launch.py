@@ -14,7 +14,7 @@ def generate_launch_description():
             description='Value for numClients'
         ),
         Node(
-            package='centralized_data_flow_scheduler',
+            package='data_flow_scheduler',
             executable='data_flow_scheduler',
             name='data_flow_scheduler',
             parameters=[

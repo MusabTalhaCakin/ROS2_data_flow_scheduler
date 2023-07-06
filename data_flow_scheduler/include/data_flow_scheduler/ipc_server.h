@@ -6,13 +6,13 @@
 #ifndef DFS_SERVER_H
 #define DFS_SERVER_H
 
-#include "centralized_data_flow_scheduler/data_flow_types.h"
+#include "data_flow_scheduler/data_flow_types.h"
 
 namespace DFS
 {
   /**
    * @class DFSServer
-   * @brief The DFSServer class handles the server-side functionality of the Centralized Data Flow Scheduler.
+   * @brief The DFSServer class handles the server-side functionality of the Data Flow Scheduler.
    */
   class DFSServer
   {

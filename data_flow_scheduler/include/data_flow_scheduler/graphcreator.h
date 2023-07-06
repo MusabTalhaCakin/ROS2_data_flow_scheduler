@@ -6,8 +6,8 @@
 #ifndef GRAPHCREATOR_H
 #define GRAPHCREATOR_H
 
-#include "centralized_data_flow_scheduler/data_flow_types.h"
-#include "centralized_data_flow_scheduler/igraphcreator.h"
+#include "data_flow_scheduler/data_flow_types.h"
+#include "data_flow_scheduler/igraphcreator.h"
 
 // lemon
 #include <lemon/list_graph.h>

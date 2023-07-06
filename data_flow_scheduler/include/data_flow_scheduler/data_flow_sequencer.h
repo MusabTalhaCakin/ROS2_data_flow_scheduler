@@ -6,10 +6,10 @@
 #ifndef DFS_SEQUENCER_H
 #define DFS_SEQUENCER_H
 
-#include "centralized_data_flow_scheduler/data_flow_types.h"
-#include "centralized_data_flow_scheduler/data_flow_hashT.h"
-#include "centralized_data_flow_scheduler/igraphcreator.h"
-#include "centralized_data_flow_scheduler/ipc_server.h"
+#include "data_flow_scheduler/data_flow_types.h"
+#include "data_flow_scheduler/data_flow_hashT.h"
+#include "data_flow_scheduler/igraphcreator.h"
+#include "data_flow_scheduler/ipc_server.h"
 
 namespace DFS
 {

@@ -4,7 +4,7 @@
 #include <functional>
 #include <string>
 #include <chrono>
-#include "centralized_data_flow_scheduler/data_flow_executor.h" // namespace DFS_Interface
+#include "data_flow_scheduler/data_flow_executor.h" // namespace DFS_Interface
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"

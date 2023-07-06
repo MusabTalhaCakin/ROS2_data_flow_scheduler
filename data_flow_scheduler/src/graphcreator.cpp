@@ -3,7 +3,7 @@
  * Operngasse 17-21, 1040 Vienna, Austria. office(at)tttech-auto.com           *
  ******************************************************************************/
 
-#include "centralized_data_flow_scheduler/graphcreator.h"
+#include "data_flow_scheduler/graphcreator.h"
 
 using namespace DFS;
 

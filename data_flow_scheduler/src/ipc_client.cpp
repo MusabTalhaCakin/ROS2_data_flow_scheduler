@@ -3,7 +3,7 @@
  * Operngasse 17-21, 1040 Vienna, Austria. office(at)tttech-auto.com           *
  ******************************************************************************/
 
-#include "centralized_data_flow_scheduler/ipc_client.h"
+#include "data_flow_scheduler/ipc_client.h"
 
 using namespace DFS_Interface;
 

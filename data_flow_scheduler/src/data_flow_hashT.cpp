@@ -3,7 +3,7 @@
  * Operngasse 17-21, 1040 Vienna, Austria. office(at)tttech-auto.com           *
  ******************************************************************************/
 
-#include "centralized_data_flow_scheduler/data_flow_hashT.h"
+#include "data_flow_scheduler/data_flow_hashT.h"
 
 using namespace DFS;
 

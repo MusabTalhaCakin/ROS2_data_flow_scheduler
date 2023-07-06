@@ -6,9 +6,9 @@
 #ifndef DFS_EXECUTOR_H
 #define DFS_EXECUTOR_H
 
-#include "centralized_data_flow_scheduler/data_flow_types.h"
-#include "centralized_data_flow_scheduler/ipc_client.h"
-#include "centralized_data_flow_scheduler/callback_handler.h"
+#include "data_flow_scheduler/data_flow_types.h"
+#include "data_flow_scheduler/ipc_client.h"
+#include "data_flow_scheduler/callback_handler.h"
 
 #include <thread>
 #include <pthread.h>
@@ -18,9 +18,9 @@ namespace DFS_Interface
 
   /**
    * @class DFSExecutor
-   * @brief This class represents an DFSExecutor in the Centralized Data Flow Scheduler.
+   * @brief This class represents an DFSExecutor in the Data Flow Scheduler.
    *
-   * A DFSExecutor contains units of executables that can be scheduled and executed by the Centralized Data Flow Scheduler.
+   * A DFSExecutor contains units of executables that can be scheduled and executed by the Data Flow Scheduler.
    * It can have both timer-based and topic-based callbacks.
    */
   class DFSExecutor
@@ -69,19 +69,19 @@ namespace DFS_Interface
     std::string node_name;                     /**< The name of the node. */
     Node_Info node_info;                       /**< Information about the DFSExecutor node. */
     DFS_Interface::CallbackHandler cb_handler; /**< Handles the execution of callbacks. */
-    DFSClient client;                          /**< Client generator to communicate with the centralized data flow scheduler. */
+    DFSClient client;                          /**< Client generator to communicate with the data flow scheduler. */
     TopicInfoVector topics_;                   /**< Topic informations for the DFSExecutor. */
     TimerInfoVector timers_;                   /**< Timer informations for the DFSExecutor. */
 
     /**
-     * @brief Initiates the DFSExecutor and establishes communication with the centralized data flow scheduler.
+     * @brief Initiates the DFSExecutor and establishes communication with the data flow scheduler.
      * @details This function sets up the necessary configurations and communication channels
-     *          to interact with the Centralized Data Flow Scheduler.
+     *          to interact with the Data Flow Scheduler.
      */
     void init();
 
     /**
-     * @brief Sends callback informations to the Centralized data flow scheduler.
+     * @brief Sends callback informations to the data flow scheduler.
      * @return True if the information is sent successfully, false otherwise.
      */
     bool send_callback_infos();
@@ -93,7 +93,7 @@ namespace DFS_Interface
     std::string serialize_buffer() const;
 
     /**
-     * @brief Reads and processes messages received from the Centralized data flow scheduler.
+     * @brief Reads and processes messages received from the data flow scheduler.
      * @param info Information about the execution.
      * @param functions_ A function vector containing publisher informations and parameters for condition based publishing.
      * @param mutex_ A mutex used to synchronize the functionvector usage.

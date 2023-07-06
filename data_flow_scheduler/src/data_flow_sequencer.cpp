@@ -3,7 +3,7 @@
  * Operngasse 17-21, 1040 Vienna, Austria. office(at)tttech-auto.com           *
  ******************************************************************************/
 
-#include "centralized_data_flow_scheduler/data_flow_sequencer.h"
+#include "data_flow_scheduler/data_flow_sequencer.h"
 
 using namespace DFS;
 volatile sig_atomic_t DFSSequencer::signalReceived = 0;
@@ -105,7 +105,7 @@ void DFSSequencer::execute_callback(int node_id,
   execute_.type = callback_type;
   execute_.mtx_id = mutex_id;
 
-  // Send the Execute_Info struct to the centralized data flow scheduler
+  // Send the Execute_Info struct to the data flow scheduler
   passerver.send_raw_data(node_id, &execute_,
                           sizeof(DFS_Interface::Execute_Info));
   if (VERBOSE)
@@ -206,7 +206,7 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
       }
       if (!signalReceived)
       {
-        // Handle responses from centralized data flow scheduler
+        // Handle responses from data flow scheduler
         // and update the executed and executed_last vectors
         bool ret = passerver.handle_response(
             execute_, available_cores, executed, executed_last);

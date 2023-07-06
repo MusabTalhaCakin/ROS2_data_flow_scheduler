@@ -6,14 +6,14 @@
 #ifndef DFS_CLIENT_H
 #define DFS_CLIENT_H
 
-#include "centralized_data_flow_scheduler/data_flow_types.h"
+#include "data_flow_scheduler/data_flow_types.h"
 
 namespace DFS_Interface
 {
 
   /**
    * @class DFSClient
-   * @brief This class represents a client for the Centralized Data Flow Scheduler.
+   * @brief This class represents a client for the Data Flow Scheduler.
    *
    * The client is responsible for establishing a connection with the sercer and
    * exchanging data and messages.
@@ -37,21 +37,21 @@ namespace DFS_Interface
     };
 
     /**
-     * @brief Connects the client to the Centralized Data Flow Scheduler server socket.
+     * @brief Connects the client to the Data Flow Scheduler server socket.
      * @param node_name The name of the node.
      * @return True if the connection is established successfully, false otherwise.
      */
     bool connect(const std::string &);
 
     /**
-     * @brief Sends data to the Centralized Data Flow Scheduler.
+     * @brief Sends data to the Data Flow Scheduler.
      * @param data The data to be sent.
      * @return True if the data is sent successfully, false otherwise.
      */
     bool send_data(const std::string &);
 
     /**
-     * @brief Sends raw data to the Centralized Data Flow Scheduler.
+     * @brief Sends raw data to the Data Flow Scheduler.
      * @param data The raw data to be sent.
      * @param size The size of the data in bytes.
      * @return True if the raw data is sent successfully, false otherwise.
@@ -60,7 +60,7 @@ namespace DFS_Interface
                        std::uint32_t) const;
 
     /**
-     * @brief Reads raw data from the Centralized Data Flow Scheduler.
+     * @brief Reads raw data from the Data Flow Scheduler.
      * @param buffer The buffer to store the received data.
      * @param size The size of the buffer in bytes.
      * @return The number of bytes read, or -1 if an error occurs.

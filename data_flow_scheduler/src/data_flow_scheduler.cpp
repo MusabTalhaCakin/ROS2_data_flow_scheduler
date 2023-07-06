@@ -1,14 +1,14 @@
-#include "centralized_data_flow_scheduler/data_flow_types.h"
-#include "centralized_data_flow_scheduler/ipc_server.h"
-#include "centralized_data_flow_scheduler/graphcreator.h"
-#include "centralized_data_flow_scheduler/data_flow_sequencer.h"
+#include "data_flow_scheduler/data_flow_types.h"
+#include "data_flow_scheduler/ipc_server.h"
+#include "data_flow_scheduler/graphcreator.h"
+#include "data_flow_scheduler/data_flow_sequencer.h"
 
 #include "rclcpp/parameter.hpp"
 
 namespace DFS
 {
   /**
-   * @brief ROS2 node for centralized data flow scheduling.
+   * @brief ROS2 node for data flow scheduling.
    */
   class DFS : public rclcpp::Node
   {
