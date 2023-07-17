@@ -13,113 +13,113 @@ def generate_launch_description():
 
     # Sensor
     s_node1 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '1', str(5000), str(0), 
+        cmd=['taskset', '-c', '0', bash_file_path, '1', str(5000), str(0), 
         'FrontLidarDriver', 'FrontLidarDriver'],
         output='screen'
     )
     s_node2 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '1', str(5001), str(0), 
+        cmd=['taskset', '-c', '0', bash_file_path, '1', str(5001), str(0), 
         'RearLidarDriver', 'RearLidarDriver'],
         output='screen'
     )
     s_node3 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '1', str(5002), str(0), 
+        cmd=['taskset', '-c', '0', bash_file_path, '1', str(5002), str(0), 
         'PointCloudMap', 'PointCloudMap'],
         output='screen'
     )
     s_node4 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '1', str(5003), str(0), 
+        cmd=['taskset', '-c', '0', bash_file_path, '1', str(5003), str(0), 
         'Visualizer', 'Visualizer'],
         output='screen'
     )
     s_node5 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '1', str(5004), str(0), 
+        cmd=['taskset', '-c', '0', bash_file_path, '1', str(5004), str(0), 
         'Lanelet2Map', 'Lanelet2Map'],
         output='screen'
     )
     s_node6 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '1', str(5005), str(0), 
+        cmd=['taskset', '-c', '0', bash_file_path, '1', str(5005), str(0), 
         'EuclideanClusterSettings', 'EuclideanClusterSettings'],
         output='screen'
     )
 
     #Transform
     t_node1 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '2', str(5000), str(2048), 'PointsTransformerFront', 
+        cmd=['taskset', '-c', '0', bash_file_path, '2', str(5000), str(2048), 'PointsTransformerFront', 
         'FrontLidarDriver', 'PointsTransformerFront'],
         output='screen'
     )
     t_node2 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '2',str(5001), str(2048), 'PointsTransformerRear', 
+        cmd=['taskset', '-c', '0', bash_file_path, '2',str(5001), str(2048), 'PointsTransformerRear', 
         'RearLidarDriver', 'PointsTransformerRear'],
         output='screen'
     )
     t_node3 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '2',str(5002), str(2048), 'VoxelGridDownsampler', 
+        cmd=['taskset', '-c', '0', bash_file_path, '2',str(5002), str(2048), 'VoxelGridDownsampler', 
        'PointCloudFusion', 'VoxelGridDownsampler'],
         output='screen'
     )
     t_node4 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '2',str(5003), str(2048), 'PointCloudMapLoader', 
+        cmd=['taskset', '-c', '0', bash_file_path, '2',str(5003), str(2048), 'PointCloudMapLoader', 
         'PointCloudMap', 'PointCloudMapLoader'],
         output='screen'
     )
     t_node5 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '2',str(5004), str(2048), 'RayGroundFilter', 
+        cmd=['taskset', '-c', '0', bash_file_path, '2',str(5004), str(2048), 'RayGroundFilter', 
         'PointCloudFusion', 'RayGroundFilter'],
         output='screen'
     )
     t_node6 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '2',str(5005), str(2048), 'ObjectCollisionEstimator', 
+        cmd=['taskset', '-c', '0', bash_file_path, '2',str(5005), str(2048), 'ObjectCollisionEstimator', 
         'EuclideanClusterDetector', 'ObjectCollisionEstimator'],
         output='screen'
     )
     t_node7 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '2',str(5006), str(2048), 'MPCController', 
+        cmd=['taskset', '-c', '0', bash_file_path, '2',str(5006), str(2048), 'MPCController', 
         'BehaviorPlanner', 'MPCController'],
         output='screen'
     )
     t_node8 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '2',str(5007), str(2048), 'ParkingPlanner', 
+        cmd=['taskset', '-c', '0', bash_file_path, '2',str(5007), str(2048), 'ParkingPlanner', 
         'Lanelet2MapLoader', 'ParkingPlanner'],
         output='screen'
     )
     t_node9 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '2',str(5008), str(2048), 'LanePlanner', 
+        cmd=['taskset', '-c', '0', bash_file_path, '2',str(5008), str(2048), 'LanePlanner', 
         'Lanelet2MapLoader', 'LanePlanner'],
         output='screen'
     )
 
     #fusion
     f_node1 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '3',str(10000), str(4096), 'PointCloudFusion', 
+        cmd=['taskset', '-c', '0', bash_file_path, '3',str(10000), str(4096), 'PointCloudFusion', 
         'PointsTransformerFront', 'PointsTransformerRear', "PointCloudFusion"],
         output='screen'
     )
     f_node2 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '3',str(10001), str(4096), 'NDTLocalizer', 
+        cmd=['taskset', '-c', '0', bash_file_path, '3',str(10001), str(4096), 'NDTLocalizer', 
         'VoxelGridDownsampler', 'PointCloudMapLoader', 'NDTLocalizer'],
         output='screen'
     )
     f_node3 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '3',str(10002), str(4096), 'VehicleInterface', 
+        cmd=['taskset', '-c', '0', bash_file_path, '3',str(10002), str(4096), 'VehicleInterface', 
         'MPCController', 'BehaviorPlanner', 'VehicleInterface'],
         output='screen'
     )
     f_node4 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '3',str(10003), str(4096), 'Lanelet2GlobalPlanner', 
+        cmd=['taskset', '-c', '0', bash_file_path, '3',str(10003), str(4096), 'Lanelet2GlobalPlanner', 
         'Visualizer', 'NDTLocalizer', 'Lanelet2GlobalPlanner'],
         output='screen'
     )
     f_node5 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '3',str(10004), str(4096), 'Lanelet2MapLoader', 
+        cmd=['taskset', '-c', '0', bash_file_path, '3',str(10004), str(4096), 'Lanelet2MapLoader', 
         'Lanelet2Map', 'Lanelet2GlobalPlanner', 'Lanelet2MapLoader'],
         output='screen'
     )
 
     #cycle
     cy_node1 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '4', str(20000), str(8192), 'BehaviorPlanner', 
+        cmd=['taskset', '-c', '0', bash_file_path, '4', str(20000), str(8192), 'BehaviorPlanner', 
         'ObjectCollisionEstimator', 'NDTLocalizer',
         'Lanelet2GlobalPlanner', 'Lanelet2MapLoader',
         'ParkingPlanner', 'LanePlanner'],
@@ -128,7 +128,7 @@ def generate_launch_description():
 
     #intersection
     i_node1 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '5',str(5000), str(2048), 'EuclideanClusterDetector', 
+        cmd=['taskset', '-c', '0', bash_file_path, '5',str(5000), str(2048), 'EuclideanClusterDetector', 
         'RayGroundFilter', 'EuclideanClusterDetector', 
         'EuclideanClusterSettings', 'EuclideanIntersection'],
         output='screen'
@@ -136,12 +136,12 @@ def generate_launch_description():
 
     #Command
     co_node1 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '6', str(5000), str(0), 'VehicleDBWSystem', 
+        cmd=['taskset', '-c', '0', bash_file_path, '6', str(5000), str(0), 'VehicleDBWSystem', 
         'VehicleInterface'],
         output='screen'
     )
     co_node2 = ExecuteProcess(
-        cmd=['taskset', '-c', '6-7', bash_file_path, '6', str(5001), str(0), 'IntersectionOutput', 
+        cmd=['taskset', '-c', '0', bash_file_path, '6', str(5001), str(0), 'IntersectionOutput', 
         'EuclideanIntersection'],
         output='screen'
     )
