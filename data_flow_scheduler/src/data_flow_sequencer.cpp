@@ -183,6 +183,15 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
         }
         if (!ready_list.empty() && available_cores > 0)
         {
+          // Random
+          /*
+          std::srand(std::time(0));
+          int randomIndex = std::rand() % ready_list.size();
+          int pr = ready_list[randomIndex];
+          */
+
+          // longest path
+          /**/
           int pr = ready_list[0];
           for (size_t k = 0; k < ready_list.size(); k++)
           {
@@ -192,6 +201,7 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
               pr = ready_list[k];
             }
           }
+          /**/
           // Execute the callback of the selected node
           execute_callback(
               gcreator.get_node_id(pr),

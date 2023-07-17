@@ -30,7 +30,7 @@
 
 #define SOCK_NAME "/tmp/ipc_socket.sock"
 #define BUFSIZE 1024
-#define CORES 4
+#define CORES 1
 #define SET_THREAD_PRIORITY false
 #define CREATE_LGF false
 #define VERBOSE false
