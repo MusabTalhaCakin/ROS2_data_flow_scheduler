@@ -3,6 +3,9 @@
  * Operngasse 17-21, 1040 Vienna, Austria. office(at)tttech-auto.com           *
  ******************************************************************************/
 
+#include <iostream>
+#include <string>
+
 #include "data_flow_scheduler/data_flow_executor.h" // namespace DFS_Interface
 
 using namespace DFS_Interface;
@@ -91,7 +94,10 @@ void DFSExecutor::init()
 // Spin function that runs in a separate thread and executes read_msgs based on incoming Execute_Info
 void DFSExecutor::spin(std::vector<std::function<void()>> &functionVector, std::mutex &vectorMutex)
 {
-  std::thread child_thread[node_info.callback_topic_name.size()];
+
+  std::vector<std::thread *> child_thread(node_info.callback_topic_name.size());
+
+  // std::thread child_thread[node_info.callback_topic_name.size()];
 
   while (1)
   {
@@ -106,15 +112,28 @@ void DFSExecutor::spin(std::vector<std::function<void()>> &functionVector, std::
     }
     else
     {
-      if (child_thread[j].joinable())
+      if (child_thread[j] != nullptr)
       {
-        // Detach the previously joined child thread
-        child_thread[j].detach();
+        if (child_thread[j]->joinable())
+        {
+          // Detach the previously joined child thread
+          std::cout << "Detaching thread " << j << "\n";
+          RCLCPP_INFO(rclcpp::get_logger(node_name + "|DFSExecutor"), "Detaching thread %d", j);
+          child_thread[j]->detach();
+          child_thread[j] = nullptr;
+        }
       }
       // Create a new child thread to execute the read_msgs function
-      child_thread[j] = std::thread(&DFSExecutor::read_msgs, this, execute_, std::ref(functionVector), std::ref(vectorMutex));
+      child_thread[j] = new std::thread(&DFSExecutor::read_msgs, this, execute_, std::ref(functionVector), std::ref(vectorMutex));
+      std::cout << "Created thread " << j << "\n";
+      RCLCPP_INFO(rclcpp::get_logger(node_name + "|DFSExecutor"), "Created new thread %d", j);
       if (SET_THREAD_PRIORITY)
-        setThreadPriority(child_thread[j], 2, node_name);
+      {
+        if (child_thread[j] != nullptr)
+        {
+          setThreadPriority(*child_thread[j], 2, node_name);
+        }
+      }
     }
   }
 }
@@ -163,6 +182,7 @@ void DFSExecutor::read_msgs(Execute_Info execute_,
                             std::vector<std::function<void()>> &functionVector,
                             std::mutex &vectorMutex)
 {
+#warning "(zayas) TODO check for thread safety of the parameters"
   std::thread T_(
       &DFS_Interface::CallbackHandler::run_callback,
       &cb_handler,
@@ -170,12 +190,17 @@ void DFSExecutor::read_msgs(Execute_Info execute_,
       execute_.callb,
       execute_.type);
   if (SET_THREAD_PRIORITY)
+  {
     setThreadPriority(T_, 2, node_name);
+  }
+
   {
     std::unique_lock<std::mutex> lock(cb_handler.timeout_condition[execute_.mtx_id]->mtx_);
     if (!cb_handler.timeout_condition[execute_.mtx_id]->cvar_.wait_for(lock,
                                                                        std::chrono::microseconds(execute_.runtime), [this, &execute_]()
-                                                                       { return cb_handler.timeout_condition[execute_.mtx_id]->finished_; }))
+                                                                       { 
+                                                                        //(zayas) TODO check for ARM behaviour of load vs x86
+                                                                        return cb_handler.timeout_condition[execute_.mtx_id]->finished_.load(); }))
     {
       RCLCPP_WARN(rclcpp::get_logger(node_name), "Timeout occurred. Function did not finish in time.");
       execute_.timeout = true;

@@ -24,7 +24,7 @@ void CallbackHandler::init(const std::string name_, const TopicInfoVector callba
 
 void CallbackHandler::run_callback(const int mtx_id, const int callback_id, const int callback_type)
 {
-  timeout_condition[mtx_id]->finished_ = false;
+  timeout_condition[mtx_id]->finished_.store(false);
   rclcpp::MessageInfo message_info;
   message_info.get_rmw_message_info().from_intra_process = false;
 

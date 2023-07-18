@@ -9,7 +9,7 @@
 
 #ifndef DFSTYPES_H
 #define DFSTYPES_H
-
+#include <atomic>
 #include <stdio.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -97,7 +97,7 @@ namespace DFS_Interface
   {
     std::mutex mtx_;               /**< The mutex for the condition variable. */
     std::condition_variable cvar_; /**< The condition variable for the timeout. */
-    bool finished_;                /**< Flag indicating if the timeout condition has finished. */
+    std::atomic<bool> finished_;   /**< Flag indicating if the timeout condition has finished. */
     bool suc_;                     /**< Flag indicating if the timeout condition was successful. */
 
     Timeout_Condition_Info() = default;
