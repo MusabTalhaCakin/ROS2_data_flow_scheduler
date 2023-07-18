@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
   {
     arguments.push_back(argv[i]);
   }
-  for (int i = 0; i < arguments.size(); i++)
+  for (unsigned int i = 0; i < arguments.size(); i++)
   {
     std::cout << arguments[i] << std::endl;
   }
