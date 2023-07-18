@@ -30,7 +30,7 @@ void DFSSequencer::print_vector(const std::vector<int> &vec) const
 
 void DFSSequencer::print_runtime() const
 {
-  int min, max;
+  int min = -1, max = -1;
   for (size_t i = 0; i < runtime_count.size(); i++)
   {
     // Find the minimum and maximum runtime values
@@ -133,7 +133,7 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
     executed_last.clear();
     auto start = std::chrono::high_resolution_clock::now();
 
-    while (executed.size() != countNodes(graph_))
+    while (executed.size() != (unsigned int)countNodes(graph_))
     {
       if (VERBOSE)
       {

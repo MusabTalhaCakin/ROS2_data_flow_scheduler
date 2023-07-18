@@ -23,7 +23,7 @@ namespace DFS
     {
       this->declare_parameter<int>("numClients", NUM_CLIENTS);
       if (!this->get_parameter<int>("numClients", NUM_CLIENTS))
-        RCLCPP_WARN(this->get_logger(), "Failed to retrieve 'numClients' parameter.", NUM_CLIENTS);
+        RCLCPP_WARN(this->get_logger(), "Failed to retrieve 'numClients' parameter. %d", NUM_CLIENTS);
 
       init(NUM_CLIENTS);
     }

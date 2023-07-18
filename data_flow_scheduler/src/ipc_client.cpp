@@ -45,8 +45,15 @@ bool DFSClient::send_data(const std::string &data)
 {
   // Copy the data into the buffer and send it
   strcpy(buffer, data.c_str());
-  write(sock, buffer, strlen(buffer) + 1);
+  auto n = write(sock, buffer, strlen(buffer) + 1);
+  if (n == -1)
+  {
+    RCLCPP_ERROR(rclcpp::get_logger(node_name), "Something went wrong sending activity\n");
+    return false;
+  }
+
   RCLCPP_INFO(rclcpp::get_logger(node_name), "Send Activity info to DFS.\n");
+
   return true;
 }
 
