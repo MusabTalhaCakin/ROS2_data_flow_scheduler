@@ -62,12 +62,11 @@ namespace nodes
           const message_t::SharedPtr input_message)
       {
         uint64_t timestamp = now_as_int();
-
-        std::lock_guard<std::mutex> lock(mutex_); //  lock for synchronized data handling
         subscriptions_[input_number].cache = input_message;
 
         // only process and publish when we can perform an actual fusion, this means
         // we have received a sample from each subscription
+        std::lock_guard<std::mutex> lock(mutex_); //  lock for synchronized data handling
         if (!subscriptions_[0].cache || !subscriptions_[1].cache)
         {
           return;

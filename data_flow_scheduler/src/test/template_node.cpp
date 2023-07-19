@@ -63,6 +63,7 @@ private:
   void topic_callback(const std_msgs::msg::String::SharedPtr msg) const
   {
     RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg->data.c_str());
+    usleep(1000);
     auto message = std_msgs::msg::String();
     message.data = "Hello, World!";
     std::lock_guard<std::mutex> lock(mutex_);

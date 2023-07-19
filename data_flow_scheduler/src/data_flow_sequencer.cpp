@@ -125,6 +125,7 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
   RCLCPP_INFO(rclcpp::get_logger(node_name), "START the Sequencer!");
   setSignalHandler();
   lemon::ListDigraph &graph_ = gcreator.get_graph();
+  auto scheduling_time = std::chrono::high_resolution_clock::now();
   while (!signalReceived)
   {
     first = true;
@@ -132,6 +133,7 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
     executed.clear();
     executed_last.clear();
     auto start = std::chrono::high_resolution_clock::now();
+    auto iteration = std::chrono::high_resolution_clock::now();
 
     while (executed.size() != (unsigned int)countNodes(graph_))
     {
@@ -233,7 +235,6 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
         std::cout << "-------\n";
       }
     }
-
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     if (VERBOSE)
@@ -242,6 +243,20 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
     }
     runtime_count.push_back(duration.count());
     hashtables.reset_table();
+
+    if (RUNTIME != 0 && RUNTIME < std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - scheduling_time).count())
+    {
+      break;
+    }
+    //-----
+    auto duration_ = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - iteration).count();
+    // Calculate the remaining time to wait
+    auto remainingTime = std::chrono::microseconds(ITERATION) - std::chrono::microseconds(duration_);
+
+    if (remainingTime.count() > 0)
+    {
+      std::this_thread::sleep_for(remainingTime);
+    }
   }
   print_runtime();
 }

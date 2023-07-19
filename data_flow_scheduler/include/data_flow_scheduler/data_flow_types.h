@@ -30,10 +30,12 @@
 
 #define SOCK_NAME "/tmp/ipc_socket.sock"
 #define BUFSIZE 1024
-#define CORES 1
+#define CORES 3
 #define SET_THREAD_PRIORITY false
 #define CREATE_LGF false
 #define VERBOSE false
+#define ITERATION 100000 // in microseconds
+#define RUNTIME 60       // in seconds
 
 namespace DFS_Interface
 {

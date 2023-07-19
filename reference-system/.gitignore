@@ -6,4 +6,5 @@ docs/site
 # ignore the doxybook2 stuff if installed
 doxybook2**
 bin
+include
 lib
