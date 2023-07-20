@@ -11,6 +11,8 @@
 #include "data_flow_scheduler/callback_handler.h"
 
 #include <thread>
+#include <vector>
+
 #include <pthread.h>
 
 namespace DFS_Interface
@@ -55,6 +57,14 @@ namespace DFS_Interface
     ~DFSExecutor()
     {
       std::cout << "[+]Destructor DFS_Interface::DFSExecutor\n";
+      for (auto th : detached_threads)
+      {
+        if (th != nullptr)
+        {
+          th->join();
+          delete th;
+        }
+      }
     };
 
     /**
@@ -66,12 +76,13 @@ namespace DFS_Interface
               std::mutex &);
 
   private:
-    std::string node_name;                     /**< The name of the node. */
-    Node_Info node_info;                       /**< Information about the DFSExecutor node. */
-    DFS_Interface::CallbackHandler cb_handler; /**< Handles the execution of callbacks. */
-    DFSClient client;                          /**< Client generator to communicate with the data flow scheduler. */
-    TopicInfoVector topics_;                   /**< Topic informations for the DFSExecutor. */
-    TimerInfoVector timers_;                   /**< Timer informations for the DFSExecutor. */
+    std::string node_name;                       /**< The name of the node. */
+    Node_Info node_info;                         /**< Information about the DFSExecutor node. */
+    DFS_Interface::CallbackHandler cb_handler;   /**< Handles the execution of callbacks. */
+    DFSClient client;                            /**< Client generator to communicate with the data flow scheduler. */
+    TopicInfoVector topics_;                     /**< Topic informations for the DFSExecutor. */
+    TimerInfoVector timers_;                     /**< Timer informations for the DFSExecutor. */
+    std::vector<std::thread *> detached_threads; /**< Holds the threads that has been detached */
 
     /**
      * @brief Initiates the DFSExecutor and establishes communication with the data flow scheduler.

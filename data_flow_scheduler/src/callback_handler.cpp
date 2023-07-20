@@ -24,7 +24,7 @@ void CallbackHandler::init(const std::string name_, const TopicInfoVector callba
 
 void CallbackHandler::run_callback(const int mtx_id, const int callback_id, const int callback_type)
 {
-  timeout_condition[mtx_id]->finished_ = false;
+  timeout_condition[mtx_id]->finished_.store(false);
   rclcpp::MessageInfo message_info;
   message_info.get_rmw_message_info().from_intra_process = false;
 
@@ -39,6 +39,7 @@ void CallbackHandler::run_callback(const int mtx_id, const int callback_id, cons
     else
     {
       timeout_condition[mtx_id]->suc_ = false;
+      RCLCPP_WARN(rclcpp::get_logger(node_name), "Could not execute Timer.");
     }
   }
 
@@ -63,8 +64,8 @@ void CallbackHandler::run_callback(const int mtx_id, const int callback_id, cons
       if (!ret)
       {
         // Failed
-        RCLCPP_ERROR(rclcpp::get_logger(node_name), "Could not handle (serialized) message.");
         timeout_condition[mtx_id]->suc_ = false;
+        RCLCPP_WARN(rclcpp::get_logger(node_name), "Failed executing Callback (serialized).");
       }
       else
       {
@@ -130,6 +131,7 @@ void CallbackHandler::run_callback(const int mtx_id, const int callback_id, cons
       {
         // Failed
         timeout_condition[mtx_id]->suc_ = false;
+        RCLCPP_WARN(rclcpp::get_logger(node_name), "Failed executing Callback.");
       }
       else
       {
@@ -149,7 +151,7 @@ bool CallbackHandler::subscription_handle(
     std::function<bool()> take_action,
     std::function<void()> handle_action)
 {
-  bool taken = false;
+  bool taken = true;
   try
   {
     taken = take_action();

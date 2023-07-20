@@ -19,7 +19,7 @@ $ colcon build
 ```
 or
 ```
-$ colcon build --package-select data_flow_scheduler autoware_reference_system reference_system reference_system_interface
+$ colcon build --packages-select data_flow_scheduler autoware_reference_system reference_system reference_system_interface
 ```
 ## How to use
 For the callbacks in the nodes to be scheduled a dfsexecutor has to be created:

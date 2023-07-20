@@ -12,147 +12,147 @@ def generate_launch_description():
     os.chmod(bash_file_path, stat.S_IRWXU)
 
     node1 = ExecuteProcess(
-        cmd=[bash_file_path, str(0), str(2), 'Node1', 'topic1'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(0), str(100000), 'Node1', 'topic1'],
         output='screen',
         cwd=launch_file_dir
     )
     node2 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(132), 'Node2', 'topic2', 'topic1'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node2', 'topic2', 'topic1'],
         output='screen',
         cwd=launch_file_dir
     )
     node3 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1792), 'Node3', 'topic3', 'topic1'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node3', 'topic3', 'topic1'],
         output='screen',
         cwd=launch_file_dir
     )
     node4 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1786), 'Node4', 'topic8', 'topic3'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node4', 'topic8', 'topic3'],
         output='screen',
         cwd=launch_file_dir
     )
     node5 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1704), 'Node5', 'topic5', 'topic1'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node5', 'topic5', 'topic1'],
         output='screen',
         cwd=launch_file_dir
     )
     node6 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1453), 'Node6', 'topic6', 'topic1'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node6', 'topic6', 'topic1'],
         output='screen',
         cwd=launch_file_dir
     )
     node7 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1132), 'Node7', 'topic7', 'topic3'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node7', 'topic7', 'topic3'],
         output='screen',
         cwd=launch_file_dir
     )
     node8 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(48), 'Node8', 'topic8', 'topic1'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node8', 'topic8', 'topic1'],
         output='screen',
         cwd=launch_file_dir
     )
     node9 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(970), 'Node9', 'topic3', 'topic3'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node9', 'topic3', 'topic3'],
         output='screen',
         cwd=launch_file_dir
     )
     node10 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(716), 'Node10', 'topic7', 'topic8'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node10', 'topic7', 'topic8'],
         output='screen',
         cwd=launch_file_dir
     )
     node11 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1349), 'Node11', 'topic11', 'topic3'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node11', 'topic11', 'topic3'],
         output='screen',
         cwd=launch_file_dir
     )
     node12 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1389), 'Node12', 'topic12', 'topic5'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node12', 'topic12', 'topic5'],
         output='screen',
         cwd=launch_file_dir
     )
     node13 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1697), 'Node13', 'topic13', 'topic2'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node13', 'topic13', 'topic2'],
         output='screen',
         cwd=launch_file_dir
     )
     node14 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1578), 'Node14', 'topic14', 'topic7'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node14', 'topic14', 'topic7'],
         output='screen',
         cwd=launch_file_dir
     )
     node15 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(994), 'Node15', 'topic15', 'topic12'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node15', 'topic15', 'topic12'],
         output='screen',
         cwd=launch_file_dir
     )
     node16 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1645), 'Node16', 'topic16', 'topic15'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node16', 'topic16', 'topic15'],
         output='screen',
         cwd=launch_file_dir
     )
     node17 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(935), 'Node17', 'topic17', 'topic14'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node17', 'topic17', 'topic14'],
         output='screen',
         cwd=launch_file_dir
     )
     node18 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1451), 'Node18', 'topic11', 'topic16'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node18', 'topic11', 'topic16'],
         output='screen',
         cwd=launch_file_dir
     )
     node19 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1509), 'Node19', 'topic19', 'topic8'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node19', 'topic19', 'topic8'],
         output='screen',
         cwd=launch_file_dir
     )
     node20 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(360), 'Node20', 'topic20', 'topic11'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node20', 'topic20', 'topic11'],
         output='screen',
         cwd=launch_file_dir
     )
     node21 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(674), 'Node21', 'topic17', 'topic20'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node21', 'topic17', 'topic20'],
         output='screen',
         cwd=launch_file_dir
     )
     node22 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1504), 'Node22', 'topic17', 'topic15'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node22', 'topic17', 'topic15'],
         output='screen',
         cwd=launch_file_dir
     )
     node23 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1465), 'Node23', 'topic23', 'topic1'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node23', 'topic23', 'topic1'],
         output='screen',
         cwd=launch_file_dir
     )
     node24 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1389), 'Node24', 'topic17', 'topic23'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node24', 'topic17', 'topic23'],
         output='screen',
         cwd=launch_file_dir
     )
     node25 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(347), 'Node25', 'topic17', 'topic6'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node25', 'topic17', 'topic6'],
         output='screen',
         cwd=launch_file_dir
     )
     node26 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(1575), 'Node26', 'topic17', 'topic13'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node26', 'topic17', 'topic13'],
         output='screen',
         cwd=launch_file_dir
     )
     node27 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(350), 'Node27', 'topic17', 'topic20'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node27', 'topic17', 'topic20'],
         output='screen',
         cwd=launch_file_dir
     )
     node28 = ExecuteProcess(
-        cmd=[bash_file_path, str(1), str(52), 'Node28', 'topic17', 'topic19'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(1), str(100000), 'Node28', 'topic17', 'topic19'],
         output='screen',
         cwd=launch_file_dir
     )
     node29 = ExecuteProcess(
-        cmd=[bash_file_path, str(0), str(1), 'Node29', 'topic29', 'topic17'],
+        cmd=['taskset', '-c', '7', bash_file_path, str(0), str(100000), 'Node29', 'topic29', 'topic17'],
         output='screen',
         cwd=launch_file_dir
     )

@@ -21,7 +21,7 @@ public:
                std::vector<std::function<void()>> &functionVector,
                std::mutex &mutex,
                const int &runtime)
-      : Node(name_), functionVector_(functionVector), mutex_(mutex), runtime_(runtime)
+      : Node(name_), mutex_(mutex), functionVector_(functionVector), runtime_(runtime)
   {
     subscription_ = this->create_subscription<std_msgs::msg::String>(
         sub_name, 10, std::bind(&TemplateNode::topic_callback, this, _1));
@@ -33,7 +33,7 @@ public:
                const std::string &pub_name,
                std::vector<std::function<void()>> &functionVector,
                std::mutex &mutex)
-      : Node(name_), functionVector_(functionVector), mutex_(mutex)
+      : Node(name_), mutex_(mutex), functionVector_(functionVector)
   {
     publisher_ = this->create_publisher<std_msgs::msg::String>(pub_name, 10);
     timer_ = this->create_wall_timer(
@@ -63,6 +63,7 @@ private:
   void topic_callback(const std_msgs::msg::String::SharedPtr msg) const
   {
     RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg->data.c_str());
+    usleep(1000);
     auto message = std_msgs::msg::String();
     message.data = "Hello, World!";
     std::lock_guard<std::mutex> lock(mutex_);
@@ -77,9 +78,9 @@ private:
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
   rclcpp::TimerBase::SharedPtr timer_;
   size_t count_;
-  int runtime_;
-  std::vector<std::function<void()>> &functionVector_;
   std::mutex &mutex_;
+  std::vector<std::function<void()>> &functionVector_;
+  int runtime_;
 };
 
 int main(int argc, char *argv[])
@@ -97,7 +98,7 @@ int main(int argc, char *argv[])
   {
     arguments.push_back(argv[i]);
   }
-  for (int i = 0; i < arguments.size(); i++)
+  for (unsigned int i = 0; i < arguments.size(); i++)
   {
     std::cout << arguments[i] << std::endl;
   }

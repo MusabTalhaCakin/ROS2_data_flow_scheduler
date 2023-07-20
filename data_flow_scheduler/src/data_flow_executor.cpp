@@ -2,6 +2,9 @@
  * Copyright (C) 2023 TTTech Auto AG. All rights reserved                      *
  * Operngasse 17-21, 1040 Vienna, Austria. office(at)tttech-auto.com           *
  ******************************************************************************/
+#include <chrono>
+#include <iostream>
+#include <string>
 
 #include "data_flow_scheduler/data_flow_executor.h" // namespace DFS_Interface
 
@@ -91,9 +94,10 @@ void DFSExecutor::init()
 // Spin function that runs in a separate thread and executes read_msgs based on incoming Execute_Info
 void DFSExecutor::spin(std::vector<std::function<void()>> &functionVector, std::mutex &vectorMutex)
 {
-  std::thread child_thread[node_info.callback_topic_name.size()];
 
-  while (1)
+  std::vector<std::thread *> child_thread(node_info.callback_topic_name.size());
+
+  while (true)
   {
     Execute_Info execute_;
     int read_ = client.read_raw_data(&execute_, sizeof(Execute_Info));
@@ -106,15 +110,31 @@ void DFSExecutor::spin(std::vector<std::function<void()>> &functionVector, std::
     }
     else
     {
-      if (child_thread[j].joinable())
+      if (child_thread[j] != nullptr)
       {
-        // Detach the previously joined child thread
-        child_thread[j].detach();
+        if (child_thread[j]->joinable())
+        {
+          // Detach the previously joined child thread
+          // std::cout << "Detaching thread " << j << "\n";
+          // RCLCPP_INFO(rclcpp::get_logger(node_name + "|DFSExecutor"), "Detaching thread %d", j);
+          auto pt = child_thread[j];
+          detached_threads.push_back(pt);
+          pt->detach();
+
+          child_thread[j] = nullptr;
+        }
       }
       // Create a new child thread to execute the read_msgs function
-      child_thread[j] = std::thread(&DFSExecutor::read_msgs, this, execute_, std::ref(functionVector), std::ref(vectorMutex));
+      child_thread[j] = new std::thread(&DFSExecutor::read_msgs, this, execute_, std::ref(functionVector), std::ref(vectorMutex));
+      // std::cout << "Created thread " << j << "\n";
+      // RCLCPP_INFO(rclcpp::get_logger(node_name + "|DFSExecutor"), "Created new thread %d", j);
       if (SET_THREAD_PRIORITY)
-        setThreadPriority(child_thread[j], 2, node_name);
+      {
+        if (child_thread[j] != nullptr)
+        {
+          setThreadPriority(*child_thread[j], 2, node_name);
+        }
+      }
     }
   }
 }
@@ -163,6 +183,7 @@ void DFSExecutor::read_msgs(Execute_Info execute_,
                             std::vector<std::function<void()>> &functionVector,
                             std::mutex &vectorMutex)
 {
+  //(zayas) TODO check for thread safety of the parameters"
   std::thread T_(
       &DFS_Interface::CallbackHandler::run_callback,
       &cb_handler,
@@ -170,15 +191,58 @@ void DFSExecutor::read_msgs(Execute_Info execute_,
       execute_.callb,
       execute_.type);
   if (SET_THREAD_PRIORITY)
-    setThreadPriority(T_, 2, node_name);
   {
+    setThreadPriority(T_, 2, node_name);
+  }
+
+  {
+    bool finish = false;
     std::unique_lock<std::mutex> lock(cb_handler.timeout_condition[execute_.mtx_id]->mtx_);
-    if (!cb_handler.timeout_condition[execute_.mtx_id]->cvar_.wait_for(lock,
-                                                                       std::chrono::microseconds(execute_.runtime), [this, &execute_]()
-                                                                       { return cb_handler.timeout_condition[execute_.mtx_id]->finished_; }))
+    const auto time_point = std::chrono::high_resolution_clock::now();
+    bool has_timeout = false;
+    do
+    {
+      // calculate how much time elapsed
+      double elapsed_time_us = std::chrono::duration<double, std::micro>(std::chrono::system_clock::now() - time_point).count();
+      int elapsed = (int)round(elapsed_time_us);
+      auto wait_time = std::chrono::microseconds(execute_.runtime - elapsed);
+      if (elapsed >= execute_.runtime)
+      {
+        // timeout!
+        has_timeout = true;
+        break;
+      }
+
+      const auto timep = std::chrono::system_clock::now() + wait_time;
+
+      const std::cv_status status = cb_handler.timeout_condition[execute_.mtx_id]->cvar_.wait_until(lock, timep);
+      if (status == std::cv_status::timeout)
+      {
+        // std::cout << "timeout" << std::endl;
+        finish = true;
+        has_timeout = true;
+        break;
+      }
+      else
+      {
+        if (cb_handler.timeout_condition[execute_.mtx_id]->finished_.load())
+        {
+          finish = true;
+          has_timeout = false;
+          break;
+        }
+        else
+        {
+          // spurious
+        }
+      }
+    } while (finish == false);
+
+    if (has_timeout)
     {
       RCLCPP_WARN(rclcpp::get_logger(node_name), "Timeout occurred. Function did not finish in time.");
       execute_.timeout = true;
+      execute_.suc = cb_handler.timeout_condition[execute_.mtx_id]->suc_;
       client.send_raw_data(&execute_, sizeof(Execute_Info));
     }
     else
@@ -191,6 +255,7 @@ void DFSExecutor::read_msgs(Execute_Info execute_,
       }
 
       execute_.timeout = false;
+      execute_.suc = cb_handler.timeout_condition[execute_.mtx_id]->suc_;
       client.send_raw_data(&execute_, sizeof(Execute_Info));
     }
   }

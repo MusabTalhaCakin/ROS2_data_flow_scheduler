@@ -30,7 +30,7 @@ void DFSSequencer::print_vector(const std::vector<int> &vec) const
 
 void DFSSequencer::print_runtime() const
 {
-  int min, max;
+  int min = -1, max = -1;
   for (size_t i = 0; i < runtime_count.size(); i++)
   {
     // Find the minimum and maximum runtime values
@@ -125,6 +125,7 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
   RCLCPP_INFO(rclcpp::get_logger(node_name), "START the Sequencer!");
   setSignalHandler();
   lemon::ListDigraph &graph_ = gcreator.get_graph();
+  auto scheduling_time = std::chrono::high_resolution_clock::now();
   while (!signalReceived)
   {
     first = true;
@@ -132,8 +133,9 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
     executed.clear();
     executed_last.clear();
     auto start = std::chrono::high_resolution_clock::now();
+    auto iteration = std::chrono::high_resolution_clock::now();
 
-    while (executed.size() != countNodes(graph_))
+    while (executed.size() != (unsigned int)countNodes(graph_))
     {
       if (VERBOSE)
       {
@@ -183,6 +185,15 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
         }
         if (!ready_list.empty() && available_cores > 0)
         {
+          // Random
+          /*
+          std::srand(std::time(0));
+          int randomIndex = std::rand() % ready_list.size();
+          int pr = ready_list[randomIndex];
+          */
+
+          // longest path
+          /**/
           int pr = ready_list[0];
           for (size_t k = 0; k < ready_list.size(); k++)
           {
@@ -192,6 +203,7 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
               pr = ready_list[k];
             }
           }
+          /**/
           // Execute the callback of the selected node
           execute_callback(
               gcreator.get_node_id(pr),
@@ -212,6 +224,22 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
             execute_, available_cores, executed, executed_last);
         if (!ret)
           signalReceived = 1;
+        if (execute_.timeout)
+        {
+          RCLCPP_WARN(rclcpp::get_logger(node_name), "Timeout occurred. Function did not finish in time.");
+          if (THROW_IERATION_TIMEOUT)
+          {
+            break;
+          }
+        }
+        if (!execute_.suc)
+        {
+          RCLCPP_WARN(rclcpp::get_logger(node_name), "Could not execute Callback.");
+          if (THROW_IERATION_EXECUTION_FAIL)
+          {
+            break;
+          }
+        }
         hashtables.erase_executed_tasks(executed_last);
       }
       if (VERBOSE)
@@ -223,7 +251,6 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
         std::cout << "-------\n";
       }
     }
-
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     if (VERBOSE)
@@ -232,6 +259,20 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
     }
     runtime_count.push_back(duration.count());
     hashtables.reset_table();
+
+    if (RUNTIME != 0 && RUNTIME < std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - scheduling_time).count())
+    {
+      break;
+    }
+    //-----
+    auto duration_ = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - iteration).count();
+    // Calculate the remaining time to wait
+    auto remainingTime = std::chrono::microseconds(ITERATION) - std::chrono::microseconds(duration_);
+
+    if (remainingTime.count() > 0)
+    {
+      std::this_thread::sleep_for(remainingTime);
+    }
   }
   print_runtime();
 }

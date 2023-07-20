@@ -99,7 +99,12 @@ void DFSServer::connect_clients(DFS_Interface::NodeInfoVector &nodeinfo_vec,
       terminate = true;
       break;
     }
-    read(client_sock[i], &buffer, BUFSIZE);
+    auto n = read(client_sock[i], &buffer, BUFSIZE);
+    if (n == -1)
+    {
+      RCLCPP_ERROR(rclcpp::get_logger(node_name), "Something went wrong reading socket\n");
+    }
+
     DFS_Interface::Node_Info nodeinfo_ = deserialize_buffer(i);
     std::cout << "[" << i << "] BUFFER:" << buffer << std::endl;
 
@@ -142,12 +147,19 @@ bool DFSServer::handle_response(DFS_Interface::Execute_Info &execute_,
     }
     if (FD_ISSET(client_sock[k], &readfds))
     {
-      read(client_sock[k], &execute_, sizeof(DFS_Interface::Execute_Info));
+      auto n = read(client_sock[k], &execute_, sizeof(DFS_Interface::Execute_Info));
+      if (n == -1)
+      {
+        RCLCPP_ERROR(rclcpp::get_logger(node_name), "Something went wrong reading socket");
+        return false;
+      }
       available_cores++;
       if (VERBOSE)
+      {
         RCLCPP_INFO(rclcpp::get_logger(node_name),
                     "READ[%d] -> ID:%d | Timeout:%s",
                     k, execute_.callb, execute_.timeout ? "true" : "false");
+      }
       executed.push_back(execute_.pr);
       executed_last_iteration.push_back(execute_.pr);
     }

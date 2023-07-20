@@ -9,7 +9,7 @@
 
 #ifndef DFSTYPES_H
 #define DFSTYPES_H
-
+#include <atomic>
 #include <stdio.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -30,10 +30,14 @@
 
 #define SOCK_NAME "/tmp/ipc_socket.sock"
 #define BUFSIZE 1024
-#define CORES 4
+#define CORES 1
 #define SET_THREAD_PRIORITY false
 #define CREATE_LGF false
 #define VERBOSE false
+#define THROW_IERATION_TIMEOUT true
+#define THROW_IERATION_EXECUTION_FAIL true
+#define ITERATION 100000 // in microseconds
+#define RUNTIME 30       // in seconds
 
 namespace DFS_Interface
 {
@@ -49,6 +53,7 @@ namespace DFS_Interface
     int type;     /**< The type of the executed task. */
     bool timeout; /**< Flag indicating if the task timed out. */
     int mtx_id;   /**< The mutex ID of the executed task. */
+    bool suc;     /**< The callback was executed successfully. */
   };
 
   /**
@@ -97,7 +102,7 @@ namespace DFS_Interface
   {
     std::mutex mtx_;               /**< The mutex for the condition variable. */
     std::condition_variable cvar_; /**< The condition variable for the timeout. */
-    bool finished_;                /**< Flag indicating if the timeout condition has finished. */
+    std::atomic<bool> finished_;   /**< Flag indicating if the timeout condition has finished. */
     bool suc_;                     /**< Flag indicating if the timeout condition was successful. */
 
     Timeout_Condition_Info() = default;
