@@ -30,12 +30,14 @@
 
 #define SOCK_NAME "/tmp/ipc_socket.sock"
 #define BUFSIZE 1024
-#define CORES 3
+#define CORES 1
 #define SET_THREAD_PRIORITY false
 #define CREATE_LGF false
 #define VERBOSE false
+#define THROW_IERATION_TIMEOUT true
+#define THROW_IERATION_EXECUTION_FAIL true
 #define ITERATION 100000 // in microseconds
-#define RUNTIME 60       // in seconds
+#define RUNTIME 30       // in seconds
 
 namespace DFS_Interface
 {
@@ -51,6 +53,7 @@ namespace DFS_Interface
     int type;     /**< The type of the executed task. */
     bool timeout; /**< Flag indicating if the task timed out. */
     int mtx_id;   /**< The mutex ID of the executed task. */
+    bool suc;     /**< The callback was executed successfully. */
   };
 
   /**

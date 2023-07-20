@@ -224,6 +224,22 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
             execute_, available_cores, executed, executed_last);
         if (!ret)
           signalReceived = 1;
+        if (execute_.timeout)
+        {
+          RCLCPP_WARN(rclcpp::get_logger(node_name), "Timeout occurred. Function did not finish in time.");
+          if (THROW_IERATION_TIMEOUT)
+          {
+            break;
+          }
+        }
+        if (!execute_.suc)
+        {
+          RCLCPP_WARN(rclcpp::get_logger(node_name), "Could not execute Callback.");
+          if (THROW_IERATION_EXECUTION_FAIL)
+          {
+            break;
+          }
+        }
         hashtables.erase_executed_tasks(executed_last);
       }
       if (VERBOSE)

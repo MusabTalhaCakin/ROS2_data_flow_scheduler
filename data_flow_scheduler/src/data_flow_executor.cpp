@@ -242,6 +242,7 @@ void DFSExecutor::read_msgs(Execute_Info execute_,
     {
       RCLCPP_WARN(rclcpp::get_logger(node_name), "Timeout occurred. Function did not finish in time.");
       execute_.timeout = true;
+      execute_.suc = cb_handler.timeout_condition[execute_.mtx_id]->suc_;
       client.send_raw_data(&execute_, sizeof(Execute_Info));
     }
     else
@@ -254,6 +255,7 @@ void DFSExecutor::read_msgs(Execute_Info execute_,
       }
 
       execute_.timeout = false;
+      execute_.suc = cb_handler.timeout_condition[execute_.mtx_id]->suc_;
       client.send_raw_data(&execute_, sizeof(Execute_Info));
     }
   }
