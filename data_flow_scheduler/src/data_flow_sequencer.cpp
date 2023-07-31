@@ -31,10 +31,10 @@ void DFSSequencer::print_vector(const std::vector<int> &vec) const
 void DFSSequencer::print_runtime() const
 {
   int min = -1, max = -1;
-  for (size_t i = 0; i < runtime_count.size(); i++)
+  for (size_t i = 10; i < (runtime_count.size() - 1); i++) // start from iteration 10
   {
     // Find the minimum and maximum runtime values
-    if (i == 0)
+    if (i == 10)
     {
       min = runtime_count[i];
       max = runtime_count[i];
@@ -49,14 +49,32 @@ void DFSSequencer::print_runtime() const
   }
   // Calculate the average runtime
   float avarage = std::accumulate(
-                      runtime_count.begin(),
+                      runtime_count.begin() + 10,
                       runtime_count.end(), 0.0) /
-                  runtime_count.size();
-  std::cout << "-----\n"
-            << "Min. loop runtime: " << min << " μs\n"
-            << "avarage loop runtime: " << avarage << " μs\n"
-            << "Max. loop runtime: " << max << " μs\n"
-            << "-----\n";
+                  (runtime_count.size() - 10); // subtract 10 from the vector size
+
+  // Calculate the median runtime
+  std::vector<int> runtime_count_copy(runtime_count.begin() + 10, runtime_count.end());
+  std::sort(runtime_count_copy.begin(), runtime_count_copy.end());
+  float median;
+  size_t n = runtime_count_copy.size();
+  if (n % 2 == 0)
+  {
+    float median1 = runtime_count_copy[n / 2 - 1];
+    float median2 = runtime_count_copy[n / 2];
+    median = (median1 + median2) / 2.0;
+  }
+  else
+  {
+    median = runtime_count_copy[n / 2];
+  }
+  std::cout
+      << "-----\n"
+      << "Min. loop runtime: " << min << " μs\n"
+      << "Average loop runtime: " << avarage << " μs\n"
+      << "Median loop runtime: " << median << " μs\n"
+      << "Max. loop runtime: " << max << " μs\n"
+      << "-----\n";
 }
 
 void DFSSequencer::all_dependet_nodes_executed(
@@ -185,15 +203,7 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
         }
         if (!ready_list.empty() && available_cores > 0)
         {
-          // Random
-          /*
-          std::srand(std::time(0));
-          int randomIndex = std::rand() % ready_list.size();
-          int pr = ready_list[randomIndex];
-          */
-
           // longest path
-          /**/
           int pr = ready_list[0];
           for (size_t k = 0; k < ready_list.size(); k++)
           {
@@ -203,7 +213,7 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
               pr = ready_list[k];
             }
           }
-          /**/
+
           // Execute the callback of the selected node
           execute_callback(
               gcreator.get_node_id(pr),

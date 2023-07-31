@@ -12,7 +12,7 @@ def generate_launch_description():
     os.chmod(bash_file_path, stat.S_IRWXU)
 
     node = ExecuteProcess(
-        cmd=['taskset', '-c', '0', bash_file_path, '24'],
+        cmd=['taskset', '-c', '3', bash_file_path, '24'],
         output='screen'
     )
     

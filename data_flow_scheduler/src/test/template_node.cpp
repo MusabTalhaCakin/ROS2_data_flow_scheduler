@@ -1,3 +1,8 @@
+/*******************************************************************************
+ * Copyright (C) 2023 TTTech Auto AG. All rights reserved                      *
+ * Operngasse 17-21, 1040 Vienna, Austria. office(at)tttech-auto.com           *
+ ******************************************************************************/
+
 #include <memory>
 #include <vector>
 #include <mutex>
@@ -63,7 +68,6 @@ private:
   void topic_callback(const std_msgs::msg::String::SharedPtr msg) const
   {
     RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg->data.c_str());
-    usleep(1000);
     auto message = std_msgs::msg::String();
     message.data = "Hello, World!";
     std::lock_guard<std::mutex> lock(mutex_);

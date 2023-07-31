@@ -39,15 +39,12 @@ endmacro()
 if(${FRAMEWORK} STREQUAL ros)
   #add dfsexecutor
   add_benchmark_executable(autoware_singlethreaded_multi_process src/ros2/executor/autoware_singlethreaded_multi_process.cpp)
-  add_benchmark_executable(autoware_dfs_executor src/ros2/executor/autoware_dfs_executor.cpp)
   add_benchmark_executable(reference_system_dfsexecutor_interface_node
     src/ros2/executor/reference_system_dfsexecutor_interface_node.cpp)
 
-    ament_target_dependencies(autoware_dfs_executor data_flow_scheduler)
     ament_target_dependencies(reference_system_dfsexecutor_interface_node 
     data_flow_scheduler)
     
-  target_link_libraries(autoware_dfs_executor data_flow_scheduler::data_flow_executor)
   target_link_libraries(reference_system_dfsexecutor_interface_node 
     data_flow_scheduler::data_flow_executor)
 
