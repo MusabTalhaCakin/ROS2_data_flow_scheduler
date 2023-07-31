@@ -34,10 +34,10 @@
 #define SET_THREAD_PRIORITY false
 #define CREATE_LGF false
 #define VERBOSE false
-#define THROW_IERATION_TIMEOUT true
-#define THROW_IERATION_EXECUTION_FAIL true
+#define THROW_IERATION_TIMEOUT false
+#define THROW_IERATION_EXECUTION_FAIL false
 #define ITERATION 100000 // in microseconds
-#define RUNTIME 30       // in seconds
+#define RUNTIME 0        // in seconds, 0 for infinit loop
 
 namespace DFS_Interface
 {

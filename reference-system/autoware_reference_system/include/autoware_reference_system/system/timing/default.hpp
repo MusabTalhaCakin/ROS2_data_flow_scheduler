@@ -39,24 +39,24 @@ namespace nodes
       // to figure out what values to place here corresponding to the run_time
       // you would like to run each node for
       // processing
-      static constexpr uint64_t POINTS_TRANSFORMER_FRONT = 4096;
-      static constexpr uint64_t POINTS_TRANSFORMER_REAR = 4096;
-      static constexpr uint64_t VOXEL_GRID_DOWNSAMPLER = 4096;
-      static constexpr uint64_t POINT_CLOUD_MAP_LOADER = 4096;
-      static constexpr uint64_t RAY_GROUND_FILTER = 4096;
-      static constexpr uint64_t EUCLIDEAN_CLUSTER_DETECTOR = 4096;
-      static constexpr uint64_t EUCLIDEAN_INTERSECTION = 4096;
-      static constexpr uint64_t OBJECT_COLLISION_ESTIMATOR = 4096;
-      static constexpr uint64_t MPC_CONTROLLER = 4096;
-      static constexpr uint64_t PARKING_PLANNER = 4096;
-      static constexpr uint64_t LANE_PLANNER = 4096;
+      static constexpr uint64_t POINTS_TRANSFORMER_FRONT = 1024;
+      static constexpr uint64_t POINTS_TRANSFORMER_REAR = 1024;
+      static constexpr uint64_t VOXEL_GRID_DOWNSAMPLER = 1024;
+      static constexpr uint64_t POINT_CLOUD_MAP_LOADER = 1024;
+      static constexpr uint64_t RAY_GROUND_FILTER = 1024;
+      static constexpr uint64_t EUCLIDEAN_CLUSTER_DETECTOR = 1024;
+      static constexpr uint64_t EUCLIDEAN_INTERSECTION = 1024;
+      static constexpr uint64_t OBJECT_COLLISION_ESTIMATOR = 1024;
+      static constexpr uint64_t MPC_CONTROLLER = 1024;
+      static constexpr uint64_t PARKING_PLANNER = 1024;
+      static constexpr uint64_t LANE_PLANNER = 1024;
 
       // fusion
-      static constexpr uint64_t POINT_CLOUD_FUSION = 4096;
-      static constexpr uint64_t NDT_LOCALIZER = 4096;
-      static constexpr uint64_t VEHICLE_INTERFACE = 4096;
-      static constexpr uint64_t LANELET_2_GLOBAL_PLANNER = 4096;
-      static constexpr uint64_t LANELET_2_MAP_LOADER = 4096;
+      static constexpr uint64_t POINT_CLOUD_FUSION = 2048;
+      static constexpr uint64_t NDT_LOCALIZER = 2048;
+      static constexpr uint64_t VEHICLE_INTERFACE = 2048;
+      static constexpr uint64_t LANELET_2_GLOBAL_PLANNER = 2048;
+      static constexpr uint64_t LANELET_2_MAP_LOADER = 2048;
 
       // cyclic
       static constexpr uint64_t BEHAVIOR_PLANNER = 4096;
