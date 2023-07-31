@@ -60,7 +60,7 @@ namespace nodes
 
       // cyclic
       static constexpr uint64_t BEHAVIOR_PLANNER = 4096;
-      static constexpr time_t BEHAVIOR_PLANNER_CYCLE = milliseconds(0);
+      static constexpr time_t BEHAVIOR_PLANNER_CYCLE = milliseconds(100);
     };
 
     constexpr Default::time_t Default::FRONT_LIDAR_DRIVER;
