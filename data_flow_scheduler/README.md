@@ -17,8 +17,5 @@ Parameters are initialized and set in the `data_flow_types.h` file. The followin
 - **ITERATION**: 100000 (Set periodic execution, 0 for no periodic consideration)
 - **RUNTIME**: 0 (in seconds, 0 for infinite)
 
-## Usage Example
-// TODO: Add an example of how to use the parameters in your code.
-
 ## License
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.

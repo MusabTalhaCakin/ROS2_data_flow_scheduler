@@ -18,7 +18,7 @@ The Data Flow Scheduler employs an innovative concept to enable efficient cross-
 - **Prerequisites:**
   - LEMON Graph Library [https://lemon.cs.elte.hu/trac/lemon]
 
-Please refer to the [LEMON Graph Library website](https://lemon.cs.elte.hu/trac/lemon) for installation guidelines and instructions.
+Please refer to the [LEMON Graph Library website](https://lemon.cs.elte.hu/trac/lemon/wiki/InstallLinux) for installation guidelines and instructions.
 
 ## Build
 To compile the ROS2 package, use `colcon build`:
