@@ -204,7 +204,7 @@ auto create_autoware_nodes()
     .output_topic = "Lanelet2MapLoader",
     .number_crunch_limit = TimingConfig::LANELET_2_MAP_LOADER}));
 
-  // cyclic node
+  /*// cyclic node
   nodes.emplace_back(
     std::make_shared<typename SystemType::Cyclic>(
       nodes::CyclicSettings{
@@ -214,7 +214,22 @@ auto create_autoware_nodes()
       "ParkingPlanner", "LanePlanner"},
     .output_topic = "BehaviorPlanner",
     .number_crunch_limit = TimingConfig::BEHAVIOR_PLANNER,
-    .cycle_time = TimingConfig::BEHAVIOR_PLANNER_CYCLE}));
+    .cycle_time = TimingConfig::BEHAVIOR_PLANNER_CYCLE})); */
+
+  // multifusion node
+  nodes.emplace_back(
+    std::make_shared<typename SystemType::MultiFusion>(
+      nodes::MultiFusionSettings{
+    .node_name = "BehaviorPlanner",
+    .input_0 = "ObjectCollisionEstimator",
+    .input_1 = "NDTLocalizer",
+    .input_2 = "Lanelet2GlobalPlanner",
+    .input_3 = "Lanelet2MapLoader",
+    .input_4 = "ParkingPlanner",
+    .input_5 = "LanePlanner",
+    .output_topic = "BehaviorPlanner",
+    .number_crunch_limit = TimingConfig::BEHAVIOR_PLANNER}));
+
 
   // intersection node
   nodes.emplace_back(

@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
        "ObjectCollisionEstimator"},
       {"FrontLidarDriver", "RearLidarDriver"},
       "ObjectCollisionEstimator");
-
+  
   switch (nt)
   {
   case 1: // SENSOR NODE
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     executor.add_node(node);
     executor.spin();
     break;
-  }
+ }
   case 4: // CYCLIC NODE
   {
     uint64_t time_t_value(std::stoi(argv[2]));
@@ -121,10 +121,29 @@ int main(int argc, char *argv[])
     executor.spin();
     break;
   }
-  default:
+  case 7: // MULTIFUSION NODE
+  {
+    uint64_t time_t_value(std::stoi(argv[2]));
+    auto node = std::make_shared<nodes::rclcpp_system::MultiFusion>(
+        nodes::MultiFusionSettings{
+            .node_name = arguments[0],
+            .input_0 = arguments[1],
+            .input_1 = arguments[2],
+            .input_2 = arguments[3],
+            .input_3 = arguments[4],
+            .input_4 = arguments[5],
+            .input_5 = arguments[6],
+            .output_topic = arguments[0],
+            .number_crunch_limit = time_t_value});
+    rclcpp::executors::SingleThreadedExecutor executor;
+    executor.add_node(node);
+    executor.spin();
     break;
-  }
+ }
+ default:
+    break;
+ }
 
-  rclcpp::shutdown();
-  return 0;
+ rclcpp::shutdown();
+ return 0;
 }

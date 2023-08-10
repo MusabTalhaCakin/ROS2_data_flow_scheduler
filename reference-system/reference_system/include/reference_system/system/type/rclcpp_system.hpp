@@ -19,6 +19,7 @@
 #include "reference_system/nodes/rclcpp/cyclic.hpp"
 #include "reference_system/nodes/rclcpp/sensor.hpp"
 #include "reference_system/nodes/rclcpp/intersection.hpp"
+#include "reference_system/nodes/rclcpp/multifusion.hpp"
 
 struct RclcppSystem
 {
@@ -30,6 +31,7 @@ struct RclcppSystem
   using Intersection = nodes::rclcpp_system::Intersection;
   using Sensor = nodes::rclcpp_system::Sensor;
   using Transform = nodes::rclcpp_system::Transform;
+  using MultiFusion = nodes::rclcpp_system::MultiFusion;
 };
 
 #endif  // REFERENCE_SYSTEM__SYSTEM__TYPE__RCLCPP_SYSTEM_HPP_
