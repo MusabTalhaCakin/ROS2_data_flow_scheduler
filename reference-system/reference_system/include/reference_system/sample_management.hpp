@@ -229,6 +229,10 @@ struct statistic_value_t
   std::string suffix;
   double adjustment = 0.0;
   double m2 = 0.0;
+  double median = 0.0;               // New member to store the median
+  double first_quartile = 0.0;       // New member to store the first quartile
+  double third_quartile = 0.0;       // New member to store the third quartile
+  std::vector<uint64_t> data_points; // Store all data points
 
   void set(const uint64_t value)
   {
@@ -251,6 +255,35 @@ struct statistic_value_t
     deviation = std::sqrt(m2 / (total_number - 1));
     min = std::min(min, value);
     max = std::max(max, value);
+
+    // Add the new value to the data points vector
+    data_points.push_back(value);
+
+    // Sort the data points vector
+    std::sort(data_points.begin(), data_points.end());
+
+    // Calculate median, first quartile, and third quartile
+    size_t n = data_points.size();
+    if (n % 2 == 1)
+    {
+      median = static_cast<double>(data_points[n / 2]);
+      first_quartile = static_cast<double>(data_points[n / 10]);
+      third_quartile = static_cast<double>(data_points[9 * n / 10]);
+    }
+    else
+    {
+      double mid1 = static_cast<double>(data_points[n / 2 - 1]);
+      double mid2 = static_cast<double>(data_points[n / 2]);
+      median = (mid1 + mid2) / 2.0;
+
+      double q1_mid1 = static_cast<double>(data_points[n / 10 - 1]);
+      double q1_mid2 = static_cast<double>(data_points[n / 10]);
+      first_quartile = (q1_mid1 + q1_mid2) / 2.0;
+
+      double q3_mid1 = static_cast<double>(data_points[9 * n / 10 - 1]);
+      double q3_mid2 = static_cast<double>(data_points[9 * n / 10]);
+      third_quartile = (q3_mid1 + q3_mid2) / 2.0;
+    }
   }
 };
 
@@ -269,11 +302,11 @@ std::ostream &operator<<(std::ostream &output, const statistic_value_t &v)
 {
   if (v.adjustment == 0.0)
   {
-    output << v.current << v.suffix << " [min=" << v.min << v.suffix << ", max=" << v.max << v.suffix << ", average=" << v.average << v.suffix << ", deviation=" << v.deviation << "]";
+    output << v.current << v.suffix << " [min=" << v.min << v.suffix << ", 10th percentile=" << v.first_quartile << v.suffix << ", average=" << v.average << v.suffix << ", median=" << v.median << v.suffix << ", 90th percentile=" << v.third_quartile << v.suffix << ", max=" << v.max << v.suffix << ", deviation=" << v.deviation << "]";
   }
   else
   {
-    output << static_cast<double>(v.current) / v.adjustment << v.suffix << " [min=" << static_cast<double>(v.min) / v.adjustment << v.suffix << ", max=" << static_cast<double>(v.max) / v.adjustment << v.suffix << ", average=" << v.average / v.adjustment << v.suffix << ", deviation=" << v.deviation / v.adjustment << v.suffix << "]";
+    output << static_cast<double>(v.current) / v.adjustment << v.suffix << " [min=" << static_cast<double>(v.min) / v.adjustment << v.suffix << ", first quartile=" << v.first_quartile / v.adjustment << v.suffix << ", average=" << v.average / v.adjustment << v.suffix << ", median=" << v.median / v.adjustment << v.suffix << ", third quartile=" << v.third_quartile / v.adjustment << v.suffix << ", max=" << static_cast<double>(v.max) / v.adjustment << v.suffix << ", deviation=" << v.deviation / v.adjustment << v.suffix << "]";
   }
   return output;
 }
