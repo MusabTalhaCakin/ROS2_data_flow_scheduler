@@ -28,10 +28,10 @@ namespace nodes
       // sensors
       static constexpr time_t FRONT_LIDAR_DRIVER = milliseconds(100);
       static constexpr time_t REAR_LIDAR_DRIVER = milliseconds(100);
-      static constexpr time_t POINT_CLOUD_MAP = milliseconds(120);
-      static constexpr time_t VISUALIZER = milliseconds(60);
+      static constexpr time_t POINT_CLOUD_MAP = milliseconds(100);
+      static constexpr time_t VISUALIZER = milliseconds(100);
       static constexpr time_t LANELET2MAP = milliseconds(100);
-      static constexpr time_t EUCLIDEAN_CLUSTER_SETTINGS = milliseconds(25);
+      static constexpr time_t EUCLIDEAN_CLUSTER_SETTINGS = milliseconds(100);
 
       // the following values are used as the number_cruncher_limit
       // to search for primes up to starting at 3
