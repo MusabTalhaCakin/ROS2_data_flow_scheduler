@@ -74,11 +74,11 @@ Before running the other nodes, execute the data_flow_scheduler node. It acts as
 
 run:
 ```
-$ ros2 run data_flow_scheduler data_flow_scheduler 24
+ros2 run data_flow_scheduler data_flow_scheduler 24
 ```
 or (set the number of client nodes in the launch file):
 ```
-$ ros2 launch data_flow_scheduler data_flow_scheduler_launch.py
+ros2 launch data_flow_scheduler data_flow_scheduler_launch.py
 ```
 ## Changes in autoware_reference_system
 to test the data_flow_scheduler with the reference system nodes the shared pointer to the activities has to be accesssible. following code has been added for each pointer:
