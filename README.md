@@ -67,7 +67,7 @@ functionv[0] = [this, message]()
 };
 ```
 ```
-  activity.spin(functionv, Mutex); 
+  executor.spin(functionv, Mutex); 
 ```
 
 Before running the other nodes, execute the data_flow_scheduler node. It acts as the server for socket communication and waits for a specified number of client nodes to connect. The number passed as an argument when running the data_flow_scheduler is the desired number of client nodes to connect with.
