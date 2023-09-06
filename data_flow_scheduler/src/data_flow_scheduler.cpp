@@ -84,6 +84,13 @@ namespace DFS
       DFS_Interface::Node_Info result;
       result.node_id = id;
 
+      // Extract Node names from the message
+      std::getline(iss, message, ';');
+      std::istringstream iss_node_name(message);
+      std::string node_name;
+      std::getline(iss_node_name, node_name, ',');
+      result.node_name = node_name;
+
       // Extract callback topic names from the message
       std::getline(iss, message, ';');
       std::istringstream iss_topic_names(message);

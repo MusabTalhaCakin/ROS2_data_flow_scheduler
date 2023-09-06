@@ -144,6 +144,9 @@ std::string DFSExecutor::serialize_buffer() const
 {
   std::string result;
 
+  // node_name
+  result += node_name + ";";
+
   for (const auto &topic_name : node_info.callback_topic_name)
   {
     result += topic_name + ",";

@@ -131,6 +131,20 @@ void DFSSequencer::execute_callback(int node_id,
                 "WRITE[%d] -> ID:%d | Type:%d | Runtime:%d",
                 node_id, callback_id, callback_type, runtime_);
 
+  //
+  std::cout << "------------" << std::endl;
+  gcreator.set_seq_num(graph_node_id);
+  auto currentTime = std::chrono::high_resolution_clock::now();
+  auto timestamp = std::chrono::duration_cast<std::chrono::microseconds>(currentTime.time_since_epoch()).count();
+
+  std::cout << "DFS Sequencer output[start]:" << std::endl;
+  std::cout << "Seq number : " << gcreator.get_seq_num(graph_node_id) << std::endl;
+  std::cout << "Node : " << gcreator.get_node_name(graph_node_id) << std::endl;
+  std::cout << "Topic : " << gcreator.get_sub_name(graph_node_id) << std::endl;
+  std::cout << "High-resolution timestamp : " << timestamp << std::endl;
+  std::cout << "------------" << std::endl;
+  //
+
   // Remove the executed node from the ready list
   auto &vec = ready_list;
   auto it = std::find(vec.begin(), vec.end(), graph_node_id);
@@ -191,10 +205,6 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
           print_vector(ready_list);
         }
       }
-      if (VERBOSE)
-      {
-        std::cout << "Wait for response ...\n";
-      }
       for (int j = 0; j < CORES; j++)
       {
         if (signalReceived)
@@ -226,6 +236,10 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
               passerver);
         }
       }
+      if (VERBOSE)
+      {
+        std::cout << "Wait for response ...\n";
+      }
       if (!signalReceived)
       {
         // Handle responses from data flow scheduler
@@ -233,7 +247,22 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
         bool ret = passerver.handle_response(
             execute_, available_cores, executed, executed_last);
         if (!ret)
+        {
           signalReceived = 1;
+        }
+
+        //
+        std::cout << "------------" << std::endl;
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        auto timestamp = std::chrono::duration_cast<std::chrono::microseconds>(currentTime.time_since_epoch()).count();
+        std::cout << "DFS Sequencer output[end]:" << std::endl;
+        std::cout << "Seq number : " << gcreator.get_seq_num(execute_.pr) << std::endl;
+        std::cout << "Node : " << gcreator.get_node_name(execute_.pr) << std::endl;
+        std::cout << "Topic : " << gcreator.get_sub_name(execute_.pr) << std::endl;
+        std::cout << "High-resolution timestamp : " << timestamp << std::endl;
+        std::cout << "------------" << std::endl;
+        //
+
         if (execute_.timeout)
         {
           RCLCPP_WARN(rclcpp::get_logger(node_name), "Timeout occurred. Function did not finish in time.");

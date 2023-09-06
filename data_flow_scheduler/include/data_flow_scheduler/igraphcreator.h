@@ -51,6 +51,11 @@ namespace DFS
      */
     virtual int get_node_id(const int pr) const = 0;
 
+    virtual std::string get_node_name(const int pr) const = 0;
+    virtual std::string get_sub_name(const int pr) const = 0;
+    virtual int get_seq_num(const int pr) const = 0;
+    virtual void set_seq_num(const int pr) const = 0;
+
     /**
      * Returns the callback ID for the given node.
      * @param pr The node identifier.

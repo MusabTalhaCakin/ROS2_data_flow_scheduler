@@ -79,6 +79,26 @@ namespace DFS
       return (*node_id)[graph_.nodeFromId(pr)];
     }
 
+    int get_seq_num(const int pr) const override
+    {
+      return (*seq_num)[graph_.nodeFromId(pr)];
+    }
+
+    void set_seq_num(const int pr) const override
+    {
+      (*seq_num)[graph_.nodeFromId(pr)] += 1;
+    }
+
+    std::string get_node_name(const int pr) const override
+    {
+      return (*node_name)[graph_.nodeFromId(pr)];
+    }
+
+    std::string get_sub_name(const int pr) const override
+    {
+      return (*sub)[graph_.nodeFromId(pr)];
+    }
+
     /**
      * @brief Retrieves the callback ID for a given node.
      * @param pr The node identifier.
@@ -120,16 +140,18 @@ namespace DFS
     }
 
   private:
-    lemon::ListDigraph graph_;                                       /**< The underlying graph. */
-    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> node_id;       /**< Node ID map. */
-    std::unique_ptr<lemon::ListDigraph::NodeMap<std::string>> sub;   /**< Subtopic map. */
-    std::unique_ptr<lemon::ListDigraph::NodeMap<std::string>> pub;   /**< Pubtopic map. */
-    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> runtime;       /**< Runtime map. */
-    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> longest_path;  /**< Longest path map. */
-    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> callback_id;   /**< Callback ID map. */
-    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> callback_type; /**< Callback type map. */
-    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> mutex_id;      /**< Mutex ID map. */
-    std::unique_ptr<lemon::ListDigraph::ArcMap<int>> run_time;       /**< Runtime for each arc. */
+    lemon::ListDigraph graph_;                                           /**< The underlying graph. */
+    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> seq_num;           /**< Seq num map. */
+    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> node_id;           /**< Node ID map. */
+    std::unique_ptr<lemon::ListDigraph::NodeMap<std::string>> node_name; /**< Node Name map. */
+    std::unique_ptr<lemon::ListDigraph::NodeMap<std::string>> sub;       /**< Subtopic map. */
+    std::unique_ptr<lemon::ListDigraph::NodeMap<std::string>> pub;       /**< Pubtopic map. */
+    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> runtime;           /**< Runtime map. */
+    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> longest_path;      /**< Longest path map. */
+    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> callback_id;       /**< Callback ID map. */
+    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> callback_type;     /**< Callback type map. */
+    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> mutex_id;          /**< Mutex ID map. */
+    std::unique_ptr<lemon::ListDigraph::ArcMap<int>> run_time;           /**< Runtime for each arc. */
 
     /**
      * @brief Computes the longest path in the graph using the Bellman-Ford algorithm.

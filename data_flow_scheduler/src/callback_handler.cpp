@@ -29,6 +29,27 @@ void CallbackHandler::run_callback(const int mtx_id, const int callback_id, cons
   rclcpp::MessageInfo message_info;
   message_info.get_rmw_message_info().from_intra_process = false;
 
+  //
+  std::cout << "------------" << std::endl;
+  seq_count[mtx_id] += 1;
+  auto currentTime = std::chrono::high_resolution_clock::now();
+  auto timestamp = std::chrono::duration_cast<std::chrono::microseconds>(currentTime.time_since_epoch()).count();
+
+  std::cout << "Cb handler output[start]:" << std::endl;
+  std::cout << "Seq : " << seq_count[mtx_id] << std::endl;
+  std::cout << "Node : " << node_name << std::endl;
+  if (callback_type == 0)
+  {
+    std::cout << "Timer" << std::endl;
+  }
+  else
+  {
+    std::cout << "Sub Topic Name : " << callbacks_vec[callback_id].name << std::endl;
+  }
+  std::cout << "High-resolution timestamp : " << timestamp << std::endl;
+  std::cout << "------------" << std::endl;
+  //
+
   if (callback_type == 0)
   { // timer
 
@@ -144,6 +165,26 @@ void CallbackHandler::run_callback(const int mtx_id, const int callback_id, cons
   std::lock_guard<std::mutex> lock(timeout_condition[mtx_id]->mtx_);
   timeout_condition[mtx_id]->finished_ = true;
   timeout_condition[mtx_id]->cvar_.notify_one();
+
+  //
+  std::cout << "------------" << std::endl;
+  currentTime = std::chrono::high_resolution_clock::now();
+  timestamp = std::chrono::duration_cast<std::chrono::microseconds>(currentTime.time_since_epoch()).count();
+
+  std::cout << "Cb handler output[start]:" << std::endl;
+  std::cout << "Seq : " << seq_count[mtx_id] << std::endl;
+  std::cout << "Node : " << node_name << std::endl;
+  if (callback_type == 0)
+  {
+    std::cout << "Timer" << std::endl;
+  }
+  else
+  {
+    std::cout << "Sub Topic Name : " << callbacks_vec[callback_id].name << std::endl;
+  }
+  std::cout << "High-resolution timestamp : " << timestamp << std::endl;
+  std::cout << "------------" << std::endl;
+  //
 }
 
 bool CallbackHandler::subscription_handle(

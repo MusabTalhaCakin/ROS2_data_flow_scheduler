@@ -10,7 +10,9 @@ using namespace DFS;
 GraphCreator::GraphCreator()
 {
   // Initialize node maps
+  seq_num = std::make_unique<lemon::ListDigraph::NodeMap<int>>(graph_);
   node_id = std::make_unique<lemon::ListDigraph::NodeMap<int>>(graph_);
+  node_name = std::make_unique<lemon::ListDigraph::NodeMap<std::string>>(graph_);
   sub = std::make_unique<lemon::ListDigraph::NodeMap<std::string>>(graph_);
   pub = std::make_unique<lemon::ListDigraph::NodeMap<std::string>>(graph_);
   runtime = std::make_unique<lemon::ListDigraph::NodeMap<int>>(graph_);
@@ -30,7 +32,9 @@ void GraphCreator::build_graph(const DFS_Interface::NodeInfoVector &nodeinfo_vec
     for (const auto &callback : node.callback_topic_name)
     {
       lemon::ListDigraph::Node node_ = graph_.addNode();
+      (*seq_num)[node_] = 0;
       (*node_id)[node_] = node.node_id;
+      (*node_name)[node_] = node.node_name;
       (*sub)[node_] = callback;
       (*pub)[node_] = node.pub_topic_name[j];
       (*runtime)[node_] = node.runtime[j];

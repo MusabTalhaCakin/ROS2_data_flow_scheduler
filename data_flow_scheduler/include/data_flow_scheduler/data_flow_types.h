@@ -49,7 +49,7 @@ namespace DFS_Interface
   {
     int callb;    /**< The callback ID of the executed task. */
     int runtime;  /**< The runtime of the executed task. */
-    int pr;       /**< The priority of the executed task. */
+    int pr;       /**< The graph node ID of the executed task. */
     int type;     /**< The type of the executed task. */
     bool timeout; /**< Flag indicating if the task timed out. */
     int mtx_id;   /**< The mutex ID of the executed task. */
@@ -61,7 +61,8 @@ namespace DFS_Interface
    */
   struct Node_Info
   {
-    int node_id;                                  /**< The ID of the node. */
+    int node_id;
+    std::string node_name;                        /**< The ID of the node. */
     std::vector<std::string> callback_topic_name; /**< The names of the callback topics. */
     std::vector<int> callback_type;               /**< The types of the callbacks. */
     std::vector<std::string> pub_topic_name;      /**< The names of the publish topics. */
