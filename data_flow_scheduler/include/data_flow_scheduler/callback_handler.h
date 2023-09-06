@@ -64,6 +64,7 @@ namespace DFS_Interface
     std::string node_name;         /**< The name of the node associated with the dfsexecutor. */
     TopicInfoVector callbacks_vec; /**< The vector of callback information. */
     TimerInfoVector timers_vec;    /**< The vector of timer information. */
+    std::vector<int> seq_count;
   };
 
 } // namespace DFS_Interface

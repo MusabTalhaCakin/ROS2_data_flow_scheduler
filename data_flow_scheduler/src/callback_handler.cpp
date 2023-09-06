@@ -17,6 +17,7 @@ void CallbackHandler::init(const std::string name_, const TopicInfoVector callba
   for (size_t i = 0; i < totalSize; ++i)
   {
     timeout_condition.push_back(std::make_unique<Timeout_Condition_Info>());
+    seq_count.push_back(0);
   }
 
   RCLCPP_INFO(rclcpp::get_logger(node_name), "CallbackHandler initialized.");

@@ -105,13 +105,13 @@ int main(int argc, char *argv[])
             .cycle_time = std::chrono::milliseconds(0)});
 
     DFS_Interface::DFSExecutor DFSExecutor(arguments[0],
-                                           {{"Cyclic_timer", 0, time_, node->return_timer_(), 0, arguments[0]}},
-                                           {{arguments[1], 1, time_, node->return_subscription_1(), 0, "Cyclic_timer"},
-                                            {arguments[2], 1, time_, node->return_subscription_2(), 1, "Cyclic_timer"},
-                                            {arguments[3], 1, time_, node->return_subscription_3(), 2, "Cyclic_timer"},
-                                            {arguments[4], 1, time_, node->return_subscription_4(), 3, "Cyclic_timer"},
-                                            {arguments[5], 1, time_, node->return_subscription_5(), 4, "Cyclic_timer"},
-                                            {arguments[6], 1, time_, node->return_subscription_6(), 5, "Cyclic_timer"}});
+                                           {{arguments[0], 0, time_, node->return_timer_(), 0, arguments[0]}},
+                                           {{arguments[1], 1, time_, node->return_subscription_1(), 0, arguments[0]},
+                                            {arguments[2], 1, time_, node->return_subscription_2(), 1, arguments[0]},
+                                            {arguments[3], 1, time_, node->return_subscription_3(), 2, arguments[0]},
+                                            {arguments[4], 1, time_, node->return_subscription_4(), 3, arguments[0]},
+                                            {arguments[5], 1, time_, node->return_subscription_5(), 4, arguments[0]},
+                                            {arguments[6], 1, time_, node->return_subscription_6(), 5, arguments[0]}});
 
     std::vector<std::function<void()>> functionVector;
     std::mutex vectorMutex;
@@ -153,6 +153,28 @@ int main(int argc, char *argv[])
     rclcpp::SubscriptionBase::SharedPtr sub = node->return_subscription_();
     DFS_Interface::DFSExecutor DFSExecutor(arguments[0],
                                            {{arguments[1], 1, time_, sub, 0}});
+
+    std::vector<std::function<void()>> functionVector;
+    std::mutex vectorMutex;
+    DFSExecutor.spin(functionVector, vectorMutex);
+    break;
+  }
+
+  case 8: // CYCLIC FUSION NODE
+  {
+    uint64_t time_t_value(std::stoi(argv[3]));
+    auto node = std::make_shared<nodes::rclcpp_system::Cyclic>(
+        nodes::CyclicSettings{
+            .node_name = arguments[0],
+            .inputs = {arguments[1], arguments[2]},
+            .output_topic = arguments[0],
+            .number_crunch_limit = time_t_value,
+            .cycle_time = std::chrono::milliseconds(0)});
+
+    DFS_Interface::DFSExecutor DFSExecutor(arguments[0],
+                                           {{arguments[0], 0, time_, node->return_timer_(), 0, arguments[0]}},
+                                           {{arguments[1], 1, time_, node->return_subscription_1(), 0, arguments[0]},
+                                            {arguments[2], 1, time_, node->return_subscription_2(), 1, arguments[0]}});
 
     std::vector<std::function<void()>> functionVector;
     std::mutex vectorMutex;
