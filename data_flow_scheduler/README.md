@@ -17,5 +17,20 @@ Parameters are initialized and set in the `data_flow_types.h` file. The followin
 - **ITERATION**: 100000 (Set periodic execution, 0 for no periodic consideration)
 - **RUNTIME**: 0 (in seconds, 0 for infinite)
 
+
+Additional configurations within the launch files: 
+- **Taskset**: specify the core on which to run the process for each node, **['taskset', '-c', '3']**.
+- **Timeout**: set the timeout Value for each callback within the launch files, **[str(5000)]**.
+- **Pseudo workload**: Set the pseudo workload of the callbacks, **[str(1024)]** (see https://github.com/MusabTalhaCakin/ROS2_data_flow_scheduler/tree/main/reference-system/autoware_reference_system, [Configure Processing Time]).
+
+Example:
+```
+t_node1 = ExecuteProcess(
+    cmd=['taskset', '-c', '3', bash_file_path, '2', str(5000), str(1024), 'PointsTransformerFront',
+    'FrontLidarDriver', 'PointsTransformerFront'],
+    output='screen'
+)
+``````
+
 ## License
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
