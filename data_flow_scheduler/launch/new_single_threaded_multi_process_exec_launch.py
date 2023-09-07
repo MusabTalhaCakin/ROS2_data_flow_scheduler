@@ -92,34 +92,34 @@ def generate_launch_description():
 
     #fusion
     f_node1 = ExecuteProcess(
-        cmd=['taskset', '-c', '3', bash_file_path, '3', str(1024), 'PointCloudFusion', 
+        cmd=['taskset', '-c', '3', bash_file_path, '3', str(2048), 'PointCloudFusion', 
         'PointsTransformerFront', 'PointsTransformerRear', "PointCloudFusion"],
         output='screen'
     )
     f_node2 = ExecuteProcess(
-        cmd=['taskset', '-c', '3', bash_file_path, '3', str(1024), 'NDTLocalizer', 
+        cmd=['taskset', '-c', '3', bash_file_path, '3', str(2048), 'NDTLocalizer', 
         'VoxelGridDownsampler', 'PointCloudMapLoader', 'NDTLocalizer'],
         output='screen'
     )
     f_node3 = ExecuteProcess(
-        cmd=['taskset', '-c', '3', bash_file_path, '3', str(1024), 'VehicleInterface', 
+        cmd=['taskset', '-c', '3', bash_file_path, '3', str(2048), 'VehicleInterface', 
         'MPCController', 'BehaviorPlanner', 'VehicleInterface'],
         output='screen'
     )
     f_node4 = ExecuteProcess(
-        cmd=['taskset', '-c', '3', bash_file_path, '3', str(1024), 'Lanelet2GlobalPlanner', 
+        cmd=['taskset', '-c', '3', bash_file_path, '3', str(2048), 'Lanelet2GlobalPlanner', 
         'Visualizer', 'NDTLocalizer', 'Lanelet2GlobalPlanner'],
         output='screen'
     )
     f_node5 = ExecuteProcess(
-        cmd=['taskset', '-c', '3', bash_file_path, '3', str(1024), 'Lanelet2MapLoader', 
+        cmd=['taskset', '-c', '3', bash_file_path, '3', str(2048), 'Lanelet2MapLoader', 
         'Lanelet2Map', 'Lanelet2GlobalPlanner', 'Lanelet2MapLoader'],
         output='screen'
     )
 
     #multifusion
     mf_node1 = ExecuteProcess(
-        cmd=['taskset', '-c', '3', bash_file_path, '7', str(1024), 'BehaviorPlanner',
+        cmd=['taskset', '-c', '3', bash_file_path, '7', str(4096), 'BehaviorPlanner',
         'ObjectCollisionEstimator', 'NDTLocalizer',
         'Lanelet2GlobalPlanner', 'Lanelet2MapLoader',
         'ParkingPlanner', 'LanePlanner', 'BehaviorPlanner'],
