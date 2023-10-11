@@ -87,7 +87,7 @@ rclcpp::SubscriptionBase::SharedPtr return_subscription_(){
 
 Also [fusion node](reference-system/reference_system/include/reference_system/nodes/rclcpp/fusion.hpp) has been modified to provide subscription for more than 1 topic.
 
-Check the [intersection node](reference-system/autoware_reference_system/src/ros2/executor/reference_system_dfsexecutor_interface_node.cpp) and the  [examples](examples) folder.
+Check the [intersection node](reference-system/autoware_reference_system/src/ros2/executor/reference_system_dfsexecutor_interface_node.cpp) and the  [examples](data_flow_scheduler/examples) folder.
 
   
 
