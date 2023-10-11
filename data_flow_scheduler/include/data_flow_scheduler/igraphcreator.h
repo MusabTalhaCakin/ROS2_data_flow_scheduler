@@ -23,7 +23,7 @@ namespace DFS
      * Builds the graph based on the given node information vector.
      * @param node_info_vector The vector containing node information.
      */
-    virtual void build_graph(const DFS_Interface::NodeInfoVector &node_info_vector) = 0;
+    virtual void build_graph(const DFSched::NodeInfoVector &node_info_vector) = 0;
 
     /**
      * Saves the graph to a file.
@@ -78,6 +78,14 @@ namespace DFS
      * @return The runtime.
      */
     virtual int get_runtime(const int pr) const = 0;
+
+    /**
+     * @brief Get the time supervision
+     *
+     * @param pr The node identifier
+     * @return DFSched::TimeSupervision the type of supervision that the node has
+     */
+    virtual DFSched::TimeSupervision get_supervision(const int pr) const = 0;
   };
 
 } // namespace DFS

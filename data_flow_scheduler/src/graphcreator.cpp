@@ -4,6 +4,7 @@
  ******************************************************************************/
 
 #include "data_flow_scheduler/graphcreator.h"
+#include <lemon/core.h>
 
 using namespace DFS;
 
@@ -18,9 +19,11 @@ GraphCreator::GraphCreator()
   callback_id = std::make_unique<lemon::ListDigraph::NodeMap<int>>(graph_);
   callback_type = std::make_unique<lemon::ListDigraph::NodeMap<int>>(graph_);
   mutex_id = std::make_unique<lemon::ListDigraph::NodeMap<int>>(graph_);
+  supervision = std::make_unique<lemon::ListDigraph::NodeMap<int>>(graph_);
 }
 
-void GraphCreator::build_graph(const DFS_Interface::NodeInfoVector &nodeinfo_vec)
+/*void GraphCreator::build_graph(const DFSched::NodeInfoVector
+&nodeinfo_vec)
 {
   // Iterate over each node in the nodeinfo_vec
   for (const auto &node : nodeinfo_vec)
@@ -54,7 +57,134 @@ void GraphCreator::build_graph(const DFS_Interface::NodeInfoVector &nodeinfo_vec
     }
   }
 
-  RCLCPP_INFO(rclcpp::get_logger("GraphCreator"), "Graph created (DIA Graph with %d nodes and %d arcs).", lemon::countNodes(graph_), lemon::countArcs(graph_));
+  RCLCPP_INFO(rclcpp::get_logger("GraphCreator"), "Graph created (DIA Graph with
+%d nodes and %d arcs).", lemon::countNodes(graph_), lemon::countArcs(graph_));
+  compute_longestpath();
+}*/
+
+lemon::ListDigraph::NodeIt GraphCreator::find_node_by_id(int id) const
+{
+  for (lemon::ListDigraph::NodeIt node_(graph_); node_ != lemon::INVALID;
+       ++node_)
+  {
+    if ((*node_id)[node_] == id)
+    {
+      return node_;
+    }
+  }
+
+  return lemon::INVALID;
+}
+
+lemon::ListDigraph::NodeIt
+GraphCreator::find_node_by_published_topic(const std::string &topic) const
+{
+  for (lemon::ListDigraph::NodeIt node_(graph_); node_ != lemon::INVALID;
+       ++node_)
+  {
+    if ((*pub)[node_] == topic)
+    {
+      return node_;
+    }
+  }
+
+  return lemon::INVALID;
+}
+
+void GraphCreator::build_graph(const DFSched::NodeInfoVector &nodeinfo_vec)
+{
+
+  std::map<std::string, lemon::ListDigraph::NodeIt> map_topicpublished_node;
+
+  // Create all the nodes
+  for (const auto &node : nodeinfo_vec)
+  {
+    lemon::ListDigraph::Node node_ = graph_.addNode();
+    (*node_id)[node_] = node.node_id;
+  }
+
+  // Iterate over each node in the nodeinfo_vec
+
+  for (const auto &node : nodeinfo_vec)
+  {
+    int j = 0;
+
+    auto node_ = find_node_by_id(node.node_id);
+    // find the node
+
+    if (node_ == lemon::INVALID)
+    {
+      continue;
+    }
+
+    (*node_id)[node_] = node.node_id;
+    if (node.callback_topic_name.empty())
+    {
+      (*sub)[node_] = nullptr;
+    }
+    else
+    {
+      for (auto sub_topic : node.callback_topic_name)
+      {
+        (*sub)[node_] = sub_topic + "," + (*sub)[node_];
+      }
+    }
+
+    if (node.pub_topic_name.empty())
+    {
+      (*pub)[node_] = nullptr;
+    }
+    else
+    {
+
+      for (auto pub_topic : node.pub_topic_name)
+      {
+        (*pub)[node_] = pub_topic + "," + (*pub)[node_];
+
+        map_topicpublished_node[pub_topic] = node_;
+      }
+    }
+
+    (*runtime)[node_] = node.runtime[0];
+    (*callback_id)[node_] = node.callback_id[0];
+    (*callback_type)[node_] = node.callback_type[0];
+    (*mutex_id)[node_] = j;
+    (*supervision)[node_] = static_cast<int32_t>(node.supervision_kind);
+  }
+
+  // Connect nodes with edges based on topic matching
+  for (const auto &node : nodeinfo_vec)
+  {
+    auto node_ = find_node_by_id(node.node_id);
+    std::cout << "Checking node " << node.node_id << "\n";
+    if (node_ != lemon::INVALID)
+    {
+      for (auto &sub : node.callback_topic_name)
+      {
+
+        auto pub_id = map_topicpublished_node.find(sub);
+        if (pub_id != map_topicpublished_node.end())
+        {
+          if ((*node_id)[pub_id->second] != node.node_id)
+          {
+            std::cout << " |-> Subscription " << sub
+                      << " comes from publisher id "
+                      << (*node_id)[pub_id->second] << "\n";
+            graph_.addArc(pub_id->second, node_);
+          }
+        }
+        else
+        {
+          std::cout << " |-> ERROR! Subscription " << sub
+                    << " is not published!\n";
+        }
+      }
+    }
+  }
+
+  RCLCPP_INFO(rclcpp::get_logger("GraphCreator"),
+              "Graph created (DIA Graph with %d nodes and %d arcs).",
+              lemon::countNodes(graph_), lemon::countArcs(graph_));
   compute_longestpath();
 }
 
@@ -79,11 +209,13 @@ void GraphCreator::compute_longestpath()
   }
 
   // Run Bellman-Ford algorithm to compute longest path
-  lemon::BellmanFord<lemon::ListDigraph, lemon::ListDigraph::ArcMap<int>> bf(graph_, *run_time);
+  lemon::BellmanFord<lemon::ListDigraph, lemon::ListDigraph::ArcMap<int>> bf(
+      graph_, *run_time);
   bf.run(end);
 
   // Store longest path distances in the longest_path node map
-  for (lemon::ListDigraph::NodeIt node_it(graph_); node_it != lemon::INVALID; ++node_it)
+  for (lemon::ListDigraph::NodeIt node_it(graph_); node_it != lemon::INVALID;
+       ++node_it)
   {
     if (node_it != end)
       (*longest_path)[node_it] = -1 * bf.dist(node_it);
@@ -108,7 +240,9 @@ void GraphCreator::save_to_file(const std::string &path) const
   writer.nodeMap("RUNTIME", *runtime);
   writer.nodeMap("LONGEST_PATH", *longest_path);
   writer.nodeMap("NAME", *sub);
+  writer.nodeMap("SUPERVISION", *supervision);
   writer.run();
 
-  RCLCPP_INFO(rclcpp::get_logger("GraphCreator"), "LGF Graph interface created.");
+  RCLCPP_INFO(rclcpp::get_logger("GraphCreator"),
+              "LGF Graph interface created.");
 }

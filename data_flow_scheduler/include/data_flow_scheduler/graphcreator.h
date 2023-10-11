@@ -10,11 +10,11 @@
 #include "data_flow_scheduler/igraphcreator.h"
 
 // lemon
-#include <lemon/list_graph.h>
-#include <lemon/lgf_writer.h>
-#include <lemon/graph_to_eps.h>
-#include <lemon/math.h>
 #include <lemon/bellman_ford.h>
+#include <lemon/graph_to_eps.h>
+#include <lemon/lgf_writer.h>
+#include <lemon/list_graph.h>
+#include <lemon/math.h>
 
 namespace DFS
 {
@@ -33,16 +33,13 @@ namespace DFS
     /**
      * @brief Destructor for GraphCreator.
      */
-    ~GraphCreator()
-    {
-      std::cout << "[+]Destructor PAS::GraphCreator\n";
-    };
+    ~GraphCreator() { std::cout << "[+]Destructor PAS::GraphCreator\n"; };
 
     /**
      * @brief Builds the graph based on the provided node information.
      * @param nodeinfo_vec The vector containing node information.
      */
-    void build_graph(const DFS_Interface::NodeInfoVector &) override;
+    void build_graph(const DFSched::NodeInfoVector &) override;
 
     /**
      * @brief Saves the graph to a file in the LGF format.
@@ -54,10 +51,7 @@ namespace DFS
      * @brief Retrieves the underlying graph.
      * @return A reference to the underlying lemon::ListDigraph.
      */
-    lemon::ListDigraph &get_graph() override
-    {
-      return graph_;
-    }
+    lemon::ListDigraph &get_graph() override { return graph_; }
 
     /**
      * @brief Retrieves the longest path value for a given node.
@@ -119,6 +113,29 @@ namespace DFS
       return (*runtime)[graph_.nodeFromId(pr)];
     }
 
+    /**
+     * @brief Get the time supervision
+     *
+     * @param pr
+     * @return DFSched::TimeSupervision
+     */
+    DFSched::TimeSupervision get_supervision(const int pr) const override
+    {
+      int supervision_kind = (*supervision)[graph_.nodeFromId(pr)];
+      switch (supervision_kind)
+      {
+      default:
+      case static_cast<int32_t>(DFSched::TimeSupervision::None):
+        return DFSched::TimeSupervision::None;
+      case static_cast<int32_t>(DFSched::TimeSupervision::Time):
+        return DFSched::TimeSupervision::Time;
+      case static_cast<int32_t>(DFSched::TimeSupervision::ThreadCPUTime):
+        return DFSched::TimeSupervision::ThreadCPUTime;
+      }
+
+      return DFSched::TimeSupervision::None;
+    }
+
   private:
     lemon::ListDigraph graph_;                                       /**< The underlying graph. */
     std::unique_ptr<lemon::ListDigraph::NodeMap<int>> node_id;       /**< Node ID map. */
@@ -130,11 +147,29 @@ namespace DFS
     std::unique_ptr<lemon::ListDigraph::NodeMap<int>> callback_type; /**< Callback type map. */
     std::unique_ptr<lemon::ListDigraph::NodeMap<int>> mutex_id;      /**< Mutex ID map. */
     std::unique_ptr<lemon::ListDigraph::ArcMap<int>> run_time;       /**< Runtime for each arc. */
+    std::unique_ptr<lemon::ListDigraph::NodeMap<int>> supervision;   /**< Time Supervison tye */
 
     /**
-     * @brief Computes the longest path in the graph using the Bellman-Ford algorithm.
+     * @brief Computes the longest path in the graph using the Bellman-Ford
+     * algorithm.
      */
     void compute_longestpath();
+
+    /**
+     * @brief Given the node id returns an iterator
+     *
+     * @param id Node id
+     * @return lemon::ListDigraph::NodeIt Iterator to the node
+     */
+    lemon::ListDigraph::NodeIt find_node_by_id(int id) const;
+
+    /**
+     * @brief Returns an interator to a node based on their published topic
+     *
+     * @param topic Published topic
+     * @return lemon::ListDigraph::NodeIt Iterator to the node
+     */
+    lemon::ListDigraph::NodeIt find_node_by_published_topic(const std::string &topic) const;
   };
 
 } // namespace DFS

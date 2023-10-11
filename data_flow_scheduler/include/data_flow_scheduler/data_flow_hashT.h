@@ -61,7 +61,7 @@ namespace DFS
      * Returns the reference to the inarc table.
      * @return Reference to the inarc table.
      */
-    std::map<int, std::vector<int>> &return_inarc()
+    ArcInfo &return_inarc()
     {
       return inarc_d;
     }
@@ -70,16 +70,16 @@ namespace DFS
      * Returns the reference to the outarc table.
      * @return Reference to the outarc table.
      */
-    std::map<int, std::vector<int>> &return_outarc()
+    ArcInfo &return_outarc()
     {
       return outarc_st;
     }
 
   private:
     std::string node_name;
-    std::map<int, std::vector<int>> inarc_st;  // Static Inarc table
-    std::map<int, std::vector<int>> inarc_d;   // Inarc table
-    std::map<int, std::vector<int>> outarc_st; // Outarc table
+    ArcInfo inarc_st;  // Static Inarc table
+    ArcInfo inarc_d;   // Inarc table
+    ArcInfo outarc_st; // Outarc table
   };
 } // PAS
 

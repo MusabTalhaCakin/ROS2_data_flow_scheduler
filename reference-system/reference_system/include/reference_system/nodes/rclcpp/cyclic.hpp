@@ -14,12 +14,14 @@
 #ifndef REFERENCE_SYSTEM__NODES__RCLCPP__CYCLIC_HPP_
 #define REFERENCE_SYSTEM__NODES__RCLCPP__CYCLIC_HPP_
 #include <chrono>
+#include <rcutils/logging.h>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "rclcpp/rclcpp.hpp"
 #include "reference_system/msg_types.hpp"
+#include "reference_system/nodes/rclcpp/common.hpp"
 #include "reference_system/nodes/settings.hpp"
 #include "reference_system/number_cruncher.hpp"
 #include "reference_system/sample_management.hpp"
@@ -36,25 +38,24 @@ namespace nodes
           : Node(settings.node_name),
             number_crunch_limit_(settings.number_crunch_limit)
       {
+
         uint64_t input_number = 0U;
         for (const auto &input_topic : settings.inputs)
         {
-          subscriptions_.emplace_back(
-              subscription_t{
-                  this->create_subscription<message_t>(
-                      input_topic, 1,
-                      [this, input_number](const message_t::SharedPtr msg)
-                      {
-                        input_callback(input_number, msg);
-                      }),
-                  0, message_t::SharedPtr()});
+
+          auto sub = create_subscription<message_t>(
+              input_topic, 1, [](const message_t::SharedPtr /*input_message*/) {});
+
+          subscriptions.push_back(sub);
           ++input_number;
         }
-        publisher_ = this->create_publisher<message_t>(settings.output_topic, 1);
-        timer_ = this->create_wall_timer(
-            settings.cycle_time,
-            [this]
-            { timer_callback(); });
+
+        auto pub = create_publisher<message_t>(settings.output_topic, 1);
+        publishers.push_back(pub);
+
+        timer_ = this->create_wall_timer(settings.cycle_time,
+                                         [this]
+                                         { timer_callback(); });
       }
 
       rclcpp::SubscriptionBase::SharedPtr return_subscription_1()
@@ -81,51 +82,61 @@ namespace nodes
       {
         return subscriptions_[5].subscription;
       }
-      rclcpp::TimerBase::SharedPtr return_timer_()
-      {
-        return timer_;
-      }
+      rclcpp::TimerBase::SharedPtr return_timer_() { return timer_; }
 
     private:
-      void input_callback(
-          const uint64_t input_number,
-          const message_t::SharedPtr input_message)
+      void input_callback(const uint64_t input_number,
+                          const message_t::SharedPtr input_message)
       {
         subscriptions_[input_number].cache = input_message;
       }
 
+    public:
       void timer_callback()
       {
+        // std::cout << __FUNCTION__ << std::endl;
         uint64_t timestamp = now_as_int();
+        message_t msg;
+        rclcpp::MessageInfo msg_info;
+        auto &publisher_ = publishers[0];
         auto number_cruncher_result = number_cruncher(number_crunch_limit_);
 
         auto output_message = publisher_->borrow_loaned_message();
         output_message.get().size = 0;
 
         uint32_t missed_samples = 0;
-        for (auto &s : subscriptions_)
+
+        // Get all the topics
+        for (auto sub_ptr : subscriptions)
         {
-          if (!s.cache)
+          // std::cout << " Checking subscription: " << sub_ptr->get_topic_name() <<
+          // "\n";
+          if (sub_ptr->take(msg, msg_info))
           {
-            continue;
+            message_t::SharedPtr type_erased_msg = std::make_shared<message_t>(msg);
+            missed_samples += get_missed_samples_and_update_seq_nr(type_erased_msg, input_sequence_number_);
+            merge_history_into_sample(output_message.get(), type_erased_msg);
+
+            // sub_ptr->handle_message(type_erased_msg2, msg_info);
           }
-
-          missed_samples +=
-              get_missed_samples_and_update_seq_nr(s.cache, s.sequence_number);
-
-          merge_history_into_sample(output_message.get(), s.cache);
-          s.cache.reset();
+          else
+          {
+            RCLCPP_WARN(this->get_logger(), "   |->No message available %s",
+                        sub_ptr->get_topic_name());
+          }
         }
-        set_sample(
-            this->get_name(), sequence_number_++, missed_samples, timestamp,
-            output_message.get());
+
+        set_sample(this->get_name(), sequence_number++, missed_samples, timestamp,
+                   output_message.get());
 
         output_message.get().data[0] = number_cruncher_result;
         publisher_->publish(std::move(output_message));
+        // RCLCPP_DEBUG(this->get_logger(), "******* Published topic %s",
+        // publisher_->get_topic_name());
+        //  std::cout << "~" << __FUNCTION__ << std::endl;
       }
 
     private:
-      rclcpp::Publisher<message_t>::SharedPtr publisher_;
       rclcpp::TimerBase::SharedPtr timer_;
 
       struct subscription_t
@@ -137,7 +148,11 @@ namespace nodes
 
       std::vector<subscription_t> subscriptions_;
       uint64_t number_crunch_limit_;
-      uint32_t sequence_number_ = 0;
+      uint32_t sequence_number = 0;
+      uint32_t input_sequence_number_ = 0;
+
+      VectorSubcriptions subscriptions;
+      VectorPublishers publishers;
     };
   } // namespace rclcpp_system
 } // namespace nodes

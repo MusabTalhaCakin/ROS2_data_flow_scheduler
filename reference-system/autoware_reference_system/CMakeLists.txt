@@ -13,11 +13,11 @@ if(NOT ${FRAMEWORK} IN_LIST AVAILABLE_FRAMEWORKS)
 endif()
 
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD 20)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra -Wpedantic -ggdb)
 endif()
 
 find_package(ament_cmake_auto REQUIRED)

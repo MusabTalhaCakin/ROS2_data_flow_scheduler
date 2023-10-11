@@ -19,6 +19,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "reference_system/msg_types.hpp"
+#include "reference_system/nodes/rclcpp/common.hpp"
 #include "reference_system/nodes/settings.hpp"
 #include "reference_system/number_cruncher.hpp"
 #include "reference_system/sample_management.hpp"
@@ -35,79 +36,89 @@ namespace nodes
           : Node(settings.node_name),
             number_crunch_limit_(settings.number_crunch_limit)
       {
-        subscriptions_[0].subscription = this->create_subscription<message_t>(
+        auto sub = create_subscription<message_t>(
             settings.input_0, 1,
-            [this](const message_t::SharedPtr msg)
-            { input_callback(0U, msg); });
-
-        subscriptions_[1].subscription = this->create_subscription<message_t>(
+            std::bind(&Fusion::process_callback, this, std::placeholders::_1));
+        auto sub2 = create_subscription<message_t>(
             settings.input_1, 1,
-            [this](const message_t::SharedPtr msg)
-            { input_callback(1U, msg); });
-        publisher_ = this->create_publisher<message_t>(settings.output_topic, 1);
+            std::bind(&Fusion::process_callback, this, std::placeholders::_1));
+
+        subscriptions.push_back(sub);
+        subscriptions.push_back(sub2);
+        RCLCPP_INFO(get_logger(), "Subscription1 '%s' Subs2 '%s' Publishing '%s'",
+                    settings.input_0.c_str(), settings.input_1.c_str(),
+                    settings.output_topic.c_str());
+
+        auto pub = create_publisher<message_t>(settings.output_topic, 1);
+        publishers.push_back(pub);
       }
 
       rclcpp::SubscriptionBase::SharedPtr return_subscription_1() const
       {
-        return subscriptions_[0].subscription;
+        return subscriptions[0];
       }
       rclcpp::SubscriptionBase::SharedPtr return_subscription_2() const
       {
-        return subscriptions_[1].subscription;
+        return subscriptions[1];
       }
 
-    private:
-      void input_callback(
-          const uint64_t input_number,
-          const message_t::SharedPtr input_message)
+      void another_callback()
       {
+        // std::cout << __FUNCTION__ << std::endl;
         uint64_t timestamp = now_as_int();
-        subscriptions_[input_number].cache = input_message;
-
-        // only process and publish when we can perform an actual fusion, this means
-        // we have received a sample from each subscription
-        std::lock_guard<std::mutex> lock(mutex_); //  lock for synchronized data handling
-        if (!subscriptions_[0].cache || !subscriptions_[1].cache)
+        message_t msg;
+        rclcpp::MessageInfo msg_info;
+        uint32_t missed_samples = 0;
+        auto number_cruncher_result = number_cruncher(number_crunch_limit_);
+        auto output_message = publishers[0]->borrow_loaned_message();
+        output_message.get().size = 0;
+        // Get all the topics
+        for (auto sub_ptr : subscriptions)
         {
-          return;
+          // std::cout << " Checking subscription: " << sub_ptr->get_topic_name() << "\n";
+          if (sub_ptr->take(msg, msg_info))
+          {
+            message_t::SharedPtr type_erased_msg = std::make_shared<message_t>(msg);
+            missed_samples += get_missed_samples_and_update_seq_nr(type_erased_msg, input_sequence_number_);
+            merge_history_into_sample(output_message.get(), type_erased_msg);
+            // sub_ptr->handle_message(type_erased_msg2, msg_info);
+          }
+          else
+          {
+            RCLCPP_WARN(this->get_logger(), "   |->No message available %s", sub_ptr->get_topic_name());
+          }
         }
 
-        auto number_cruncher_result = number_cruncher(number_crunch_limit_);
-        auto output_message = publisher_->borrow_loaned_message();
+        set_sample(this->get_name(), sequence_number_++, missed_samples, timestamp,
+                   output_message.get());
 
-        output_message.get().size = 0;
-        uint32_t missed_samples =
-            get_missed_samples_and_update_seq_nr(
-                subscriptions_[0].cache, subscriptions_[0].sequence_number) +
-            get_missed_samples_and_update_seq_nr(
-                subscriptions_[1].cache, subscriptions_[1].sequence_number);
-        merge_history_into_sample(output_message.get(), subscriptions_[0].cache);
-        merge_history_into_sample(output_message.get(), subscriptions_[1].cache);
-        set_sample(
-            this->get_name(), sequence_number_++, missed_samples, timestamp,
-            output_message.get());
-
+        // use result so that it is not optimizied away by some clever compiler
         output_message.get().data[0] = number_cruncher_result;
-        publisher_->publish(std::move(output_message));
 
-        subscriptions_[0].cache.reset();
-        subscriptions_[1].cache.reset();
+        publishers[0]->publish(std::move(output_message));
+        // RCLCPP_WARN(this->get_logger(), "******* Published topic %s",
+        // publishers[0]->get_topic_name());
+        // std::cout << "~" << __FUNCTION__ <<   std::endl;
       }
 
     private:
-      struct subscription_t
+      void process_callback(const message_t::SharedPtr /*input_message*/)
       {
-        rclcpp::Subscription<message_t>::SharedPtr subscription;
-        uint32_t sequence_number = 0;
-        message_t::SharedPtr cache;
-      };
-      rclcpp::Publisher<message_t>::SharedPtr publisher_;
+        std::cout << __FUNCTION__ << std::endl;
+      }
 
-      subscription_t subscriptions_[2];
+      void input_callback(const uint64_t /*input_number*/,
+                          const message_t::SharedPtr /*input_message*/)
+      {
+      }
 
+    private:
       uint64_t number_crunch_limit_;
       uint32_t sequence_number_ = 0;
       std::mutex mutex_;
+      uint32_t input_sequence_number_ = 0;
+      VectorSubcriptions subscriptions;
+      VectorPublishers publishers;
     };
   } // namespace rclcpp_system
 } // namespace nodes

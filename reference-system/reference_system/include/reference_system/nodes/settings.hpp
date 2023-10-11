@@ -72,18 +72,5 @@ namespace nodes
     std::string topic_name;
     std::chrono::nanoseconds cycle_time;
   };
-  struct MultiFusionSettings
-  {
-    std::string node_name;
-    std::string input_0;
-    std::string input_1;
-    std::string input_2;
-    std::string input_3;
-    std::string input_4;
-    std::string input_5;
-    std::string output_topic;
-    uint64_t number_crunch_limit;
-  };
-
 } // namespace nodes
 #endif // REFERENCE_SYSTEM__NODES__SETTINGS_HPP_

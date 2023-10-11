@@ -8,7 +8,7 @@
 
 #include "data_flow_scheduler/data_flow_types.h"
 
-namespace DFS_Interface
+namespace DFSched
 {
 
   /**
@@ -30,10 +30,7 @@ namespace DFS_Interface
     /**
      * @brief Destructor for the CallbackHandler class.
      */
-    ~CallbackHandler()
-    {
-      std::cout << "[+]Destructor PAS::CallbackHandler\n";
-    };
+    ~CallbackHandler() { std::cout << "[+]Destructor PAS::CallbackHandler\n"; };
 
     /**
      * @brief Executes the specified callback.
@@ -49,24 +46,15 @@ namespace DFS_Interface
      * @param callbacks Vector of callback information.
      * @param timers Vector of timer information.
      */
-    void init(const std::string, const TopicInfoVector,
-              const TimerInfoVector);
+    void init(const std::string &, const TopicInfoVector, const TimerInfoVector, const CallbackInfoVector &);
 
-    /**
-     * @brief Handles a subscription request from the Data Flow Scheduler.
-     * @return True if the subscription request is handled successfully, false otherwise.
-     */
-    bool subscription_handle(const char *, const char *,
-                             std::function<bool()>,
-                             std::function<void()>);
-
-  private:
+    private:
     std::string node_name;         /**< The name of the node associated with the dfsexecutor. */
     TopicInfoVector callbacks_vec; /**< The vector of callback information. */
     TimerInfoVector timers_vec;    /**< The vector of timer information. */
-    std::vector<int> seq_count;
+    CallbackInfoVector callbacks;
   };
 
-} // namespace DFS_Interface
+} // namespace DFSched
 
 #endif

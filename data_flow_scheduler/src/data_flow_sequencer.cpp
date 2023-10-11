@@ -4,6 +4,7 @@
  ******************************************************************************/
 
 #include "data_flow_scheduler/data_flow_sequencer.h"
+#include <unistd.h>
 
 using namespace DFS;
 volatile sig_atomic_t DFSSequencer::signalReceived = 0;
@@ -31,7 +32,8 @@ void DFSSequencer::print_vector(const std::vector<int> &vec) const
 void DFSSequencer::print_runtime() const
 {
   int min = -1, max = -1;
-  for (size_t i = 10; i < (runtime_count.size() - 1); i++) // start from iteration 10
+  for (size_t i = 10; i < (runtime_count.size() - 1);
+       i++) // start from iteration 10
   {
     // Find the minimum and maximum runtime values
     if (i == 10)
@@ -48,13 +50,13 @@ void DFSSequencer::print_runtime() const
     }
   }
   // Calculate the average runtime
-  float avarage = std::accumulate(
-                      runtime_count.begin() + 10,
-                      runtime_count.end(), 0.0) /
-                  (runtime_count.size() - 10); // subtract 10 from the vector size
+  float average =
+      std::accumulate(runtime_count.begin() + 10, runtime_count.end(), 0.0) /
+      (runtime_count.size() - 10); // subtract 10 from the vector size
 
   // Calculate the median runtime
-  std::vector<int> runtime_count_copy(runtime_count.begin() + 10, runtime_count.end());
+  std::vector<int> runtime_count_copy(runtime_count.begin() + 10,
+                                      runtime_count.end());
   std::sort(runtime_count_copy.begin(), runtime_count_copy.end());
   float median;
   size_t n = runtime_count_copy.size();
@@ -68,18 +70,15 @@ void DFSSequencer::print_runtime() const
   {
     median = runtime_count_copy[n / 2];
   }
-  std::cout
-      << "-----\n"
-      << "Min. loop runtime: " << min << " μs\n"
-      << "Average loop runtime: " << avarage << " μs\n"
-      << "Median loop runtime: " << median << " μs\n"
-      << "Max. loop runtime: " << max << " μs\n"
-      << "-----\n";
+  std::cout << "-----\n"
+            << "Min. loop runtime: " << min << " μs\n"
+            << "Average loop runtime: " << average << " μs\n"
+            << "Median loop runtime: " << median << " μs\n"
+            << "Max. loop runtime: " << max << " μs\n"
+            << "-----\n";
 }
 
-void DFSSequencer::all_dependet_nodes_executed(
-    std::map<int, std::vector<int>> &inarc,
-    std::map<int, std::vector<int>> outarc)
+void DFSSequencer::all_dependet_nodes_executed(ArcInfo &inarc, ArcInfo &outarc)
 {
   bool already_in_list = false;
   for (size_t i = 0; i < executed_last.size(); i++)
@@ -96,7 +95,6 @@ void DFSSequencer::all_dependet_nodes_executed(
         // Add nodes to the ready list if all incoming arcs are executed
         if (inarc[outarc[executed_last[i]][j]].empty())
         {
-
           ready_list.push_back(outarc[executed_last[i]][j]);
         }
       }
@@ -106,36 +104,42 @@ void DFSSequencer::all_dependet_nodes_executed(
   executed_last.clear();
 }
 
-void DFSSequencer::execute_callback(int node_id,
-                                    int graph_node_id,
-                                    int runtime_,
-                                    std::vector<int> &ready_list,
-                                    int callback_id,
-                                    int callback_type,
-                                    int mutex_id,
-                                    DFSServer &passerver)
+void DFSSequencer::execute_callback(int node_id, int graph_node_id,
+                                    int runtime_, std::vector<int> &ready_list,
+                                    int callback_id, int callback_type,
+                                    int mutex_id, DFSched::TimeSupervision supervision_kind, DFSServer &passerver)
 {
-  // Prepare the Execute_Info struct
+  // std::cout << __FUNCTION__ << std::endl;
+  //  Prepare the Execute_Info struct
   available_cores--;
   execute_.callb = callback_id;
   execute_.runtime = runtime_;
   execute_.pr = graph_node_id;
   execute_.type = callback_type;
   execute_.mtx_id = mutex_id;
+  execute_.supervision_kind = supervision_kind;
+
+  /*if(VERBOSE){
+  std::cout << " |-> callback_id: " << callback_id << "\n";
+  std::cout << " |-> runtime_: " << runtime_ << "\n";
+  std::cout << " |-> graph_node_id: " << graph_node_id << "\n";
+  std::cout << " |-> callback_type: " << callback_type << "\n";
+  std::cout << " |-> mutex_id: " << mutex_id << "\n";
+  }*/
 
   // Send the Execute_Info struct to the data flow scheduler
-  passerver.send_raw_data(node_id, &execute_,
-                          sizeof(DFS_Interface::Execute_Info));
+  passerver.send_raw_data(node_id, &execute_, sizeof(DFSched::ExecutionParams));
   if (VERBOSE)
-    RCLCPP_INFO(rclcpp::get_logger(node_name),
-                "WRITE[%d] -> ID:%d | Type:%d | Runtime:%d",
-                node_id, callback_id, callback_type, runtime_);
-
+  {
+    RCLCPP_INFO(rclcpp::get_logger(node_name), "WRITE[%d] -> ID:%d | Type:%d | Runtime:%d", node_id, callback_id, callback_type, runtime_);
+  }
   // Remove the executed node from the ready list
   auto &vec = ready_list;
   auto it = std::find(vec.begin(), vec.end(), graph_node_id);
   if (it != vec.end())
+  {
     vec.erase(it);
+  }
 }
 
 void DFSSequencer::start_sequencer(DFSServer &passerver)
@@ -144,6 +148,10 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
   setSignalHandler();
   lemon::ListDigraph &graph_ = gcreator.get_graph();
   auto scheduling_time = std::chrono::high_resolution_clock::now();
+
+  /* Wait for all the entities to be created */
+  std::this_thread::sleep_for(std::chrono::milliseconds(SEQ_START_DELAY_MS));
+
   while (!signalReceived)
   {
     first = true;
@@ -183,8 +191,7 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
       else if (!executed_last.empty())
       {
         // Check if all dependent nodes are executed and add them to the ready list
-        all_dependet_nodes_executed(hashtables.return_inarc(),
-                                    hashtables.return_outarc());
+        all_dependet_nodes_executed(hashtables.return_inarc(), hashtables.return_outarc());
         if (VERBOSE)
         {
           std::cout << "[READY LIST] \n";
@@ -193,14 +200,17 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
       }
       if (VERBOSE)
       {
-        std::cout << "Wait for response ...\n";
+        std::cout << "Waiting for response ...\n";
       }
+
       for (int j = 0; j < CORES; j++)
       {
         if (signalReceived)
         {
+          // cancel the execution
           break;
         }
+
         if (!ready_list.empty() && available_cores > 0)
         {
           // longest path
@@ -215,36 +225,38 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
           }
 
           // Execute the callback of the selected node
-          execute_callback(
-              gcreator.get_node_id(pr),
-              pr,
-              gcreator.get_runtime(pr),
-              ready_list,
-              gcreator.get_callback_id(pr),
-              gcreator.get_callback_type(pr),
-              gcreator.get_mutex_id(pr),
-              passerver);
+          execute_callback(gcreator.get_node_id(pr), pr,
+                           gcreator.get_runtime(pr), ready_list,
+                           gcreator.get_callback_id(pr),
+                           gcreator.get_callback_type(pr),
+                           gcreator.get_mutex_id(pr),
+                           gcreator.get_supervision(pr),
+                           passerver);
         }
       }
+
       if (!signalReceived)
       {
         // Handle responses from data flow scheduler
         // and update the executed and executed_last vectors
-        bool ret = passerver.handle_response(
-            execute_, available_cores, executed, executed_last);
+        bool ret = passerver.handle_response(execute_, available_cores, executed, executed_last);
         if (!ret)
-          signalReceived = 1;
-        if (execute_.timeout)
         {
-          RCLCPP_WARN(rclcpp::get_logger(node_name), "Timeout occurred. Function did not finish in time.");
+          signalReceived = 1;
+        }
+
+        {
+          if (execute_.timeout)
+            RCLCPP_WARN(rclcpp::get_logger(node_name), "Timeout occurred. Callback %d did not finish in time.", execute_.callb);
           if (THROW_IERATION_TIMEOUT)
           {
             break;
           }
         }
+
         if (!execute_.suc)
         {
-          RCLCPP_WARN(rclcpp::get_logger(node_name), "Could not execute Callback.");
+          RCLCPP_WARN(rclcpp::get_logger(node_name), "No data in node to execute the callback %d", execute_.callb);
           if (THROW_IERATION_EXECUTION_FAIL)
           {
             break;
@@ -262,7 +274,8 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
       }
     }
     auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    auto duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     if (VERBOSE)
     {
       std::cout << " loop runtime: " << duration.count() << " μs\n";
@@ -270,14 +283,21 @@ void DFSSequencer::start_sequencer(DFSServer &passerver)
     runtime_count.push_back(duration.count());
     hashtables.reset_table();
 
-    if (RUNTIME != 0 && RUNTIME < std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - scheduling_time).count())
+    if (RUNTIME != 0 &&
+        RUNTIME <
+            std::chrono::duration_cast<std::chrono::seconds>(
+                std::chrono::high_resolution_clock::now() - scheduling_time)
+                .count())
     {
       break;
     }
     //-----
-    auto duration_ = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - iteration).count();
+    auto duration_ = std::chrono::duration_cast<std::chrono::microseconds>(
+                         std::chrono::high_resolution_clock::now() - iteration)
+                         .count();
     // Calculate the remaining time to wait
-    auto remainingTime = std::chrono::microseconds(ITERATION) - std::chrono::microseconds(duration_);
+    auto remainingTime = std::chrono::microseconds(ITERATION) -
+                         std::chrono::microseconds(duration_);
 
     if (remainingTime.count() > 0)
     {
