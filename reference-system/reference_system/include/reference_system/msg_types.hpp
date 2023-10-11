@@ -18,4 +18,4 @@
 
 using message_t = reference_interfaces::msg::Message4kb;
 
-#endif  // REFERENCE_SYSTEM__MSG_TYPES_HPP_
+#endif // REFERENCE_SYSTEM__MSG_TYPES_HPP_

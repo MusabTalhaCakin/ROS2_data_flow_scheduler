@@ -7,6 +7,13 @@
 #include "reference_system/system/type/rclcpp_system.hpp"
 #include "autoware_reference_system/autoware_system_builder.hpp"
 
+
+// ignore the warning about designated initializers - they make the code much
+// more readable
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+
+
 int main(int argc, char *argv[])
 {
   rclcpp::init(argc, argv);
@@ -110,31 +117,11 @@ int main(int argc, char *argv[])
   }
   case 6: // COMMAND NODE
   {
-    uint64_t time_t_value(std::stoi(argv[2]));
     auto node = std::make_shared<nodes::rclcpp_system::Command>(
         nodes::CommandSettings{
             .node_name = arguments[0],
             .input_topic = arguments[1]});
 
-    rclcpp::executors::SingleThreadedExecutor executor;
-    executor.add_node(node);
-    executor.spin();
-    break;
-  }
-  case 7: // MULTIFUSION NODE
-  {
-    uint64_t time_t_value(std::stoi(argv[2]));
-    auto node = std::make_shared<nodes::rclcpp_system::MultiFusion>(
-        nodes::MultiFusionSettings{
-            .node_name = arguments[0],
-            .input_0 = arguments[1],
-            .input_1 = arguments[2],
-            .input_2 = arguments[3],
-            .input_3 = arguments[4],
-            .input_4 = arguments[5],
-            .input_5 = arguments[6],
-            .output_topic = arguments[0],
-            .number_crunch_limit = time_t_value});
     rclcpp::executors::SingleThreadedExecutor executor;
     executor.add_node(node);
     executor.spin();

@@ -3,6 +3,7 @@
  * Operngasse 17-21, 1040 Vienna, Austria. office(at)tttech-auto.com           *
  ******************************************************************************/
 
+#include "data_flow_scheduler/data_flow_types.h"
 #include "data_flow_scheduler/data_flow_hashT.h"
 
 using namespace DFS;
@@ -53,10 +54,10 @@ void DFSHashT::reset_table()
 // Iterate over the executed tasks from the last iteration
 void DFSHashT::erase_executed_tasks(const std::vector<int> &executed_last)
 {
-  for (size_t i = 0; i < executed_last.size(); i++)
+  for (size_t i = 0; i < executed_last.size(); ++i)
   {
     // Iterate over the outgoing arcs of the executed task
-    for (size_t j = 0; j < outarc_st[executed_last[i]].size(); j++)
+    for (size_t j = 0; j < outarc_st[executed_last[i]].size(); ++j)
     {
       if (!outarc_st[executed_last[i]].empty())
       {
@@ -75,9 +76,9 @@ void DFSHashT::erase_executed_tasks(const std::vector<int> &executed_last)
 void DFSHashT::print_inarc_table() const
 {
   std::cout << "[INARCS MAP]\n";
-  std::map<int, std::vector<int>> arc = inarc_d;
+  ArcInfo arc = inarc_d;
   // Iterate through the map and print the elements
-  std::map<int, std::vector<int>>::iterator it = arc.begin();
+  auto it = arc.begin();
   while (it != arc.end())
   {
     std::cout << " ID: " << it->first << ", Values: ";
@@ -93,14 +94,14 @@ void DFSHashT::print_inarc_table() const
 void DFSHashT::print_outarc_table() const
 {
   std::cout << "[OUTARCS MAP]\n";
-  std::map<int, std::vector<int>> arc = outarc_st;
+  ArcInfo arc = outarc_st;
   // Iterate through the map and print the elements
-  std::map<int, std::vector<int>>::iterator it = arc.begin();
+  auto it = arc.begin();
   while (it != arc.end())
   {
 
     std::cout << " ID: " << it->first << ", Values: ";
-    for (size_t j = 0; j < it->second.size(); j++)
+    for (size_t j = 0; j < it->second.size(); ++j)
     {
       std::cout << it->second[j] << " ";
     }

@@ -14,13 +14,16 @@
 #ifndef REFERENCE_SYSTEM__NODES__RCLCPP__INTERSECTION_HPP_
 #define REFERENCE_SYSTEM__NODES__RCLCPP__INTERSECTION_HPP_
 #include <chrono>
+#include <cstdint>
+#include <memory>
+#include <rclcpp/logging.hpp>
 #include <string>
 #include <utility>
 #include <vector>
-#include <memory>
 
 #include "rclcpp/rclcpp.hpp"
 #include "reference_system/msg_types.hpp"
+#include "reference_system/nodes/rclcpp/common.hpp"
 #include "reference_system/nodes/settings.hpp"
 #include "reference_system/number_cruncher.hpp"
 #include "reference_system/sample_management.hpp"
@@ -38,25 +41,23 @@ namespace nodes
       {
         for (auto &connection : settings.connections)
         {
-          rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>> options;
-          rclcpp::CallbackGroup::SharedPtr callback_group = this->create_callback_group(
-              rclcpp::CallbackGroupType::MutuallyExclusive);
-          options.callback_group = callback_group;
-          connections_.emplace_back(
-              Connection{
-                  this->create_publisher<message_t>(connection.output_topic, 1),
-                  this->create_subscription<message_t>(
-                      connection.input_topic, 1,
-                      [this, id = connections_.size()](const message_t::SharedPtr msg)
-                      {
-                        input_callback(msg, id);
-                      }),
-                  callback_group,
-                  connection.number_crunch_limit});
+
+          auto sub = create_subscription<message_t>(connection.input_topic, 1, [](const message_t::SharedPtr /*input_message*/) {});
+          subscriptions.push_back(sub);
+
+          auto pub = create_publisher<message_t>(connection.output_topic, 1);
+
+          publishers.push_back(pub);
+
+          RCLCPP_INFO(get_logger(), "Subscription '%s' Publishing '%s'",
+                      connection.input_topic.c_str(),
+                      connection.output_topic.c_str());
+
+          connections_.emplace_back(Connection{nullptr, nullptr, nullptr, connection.number_crunch_limit});
         }
       }
-      rclcpp::CallbackGroup::SharedPtr get_callback_group_of_subscription(
-          const std::string &input_topic)
+      rclcpp::CallbackGroup::SharedPtr
+      get_callback_group_of_subscription(const std::string &input_topic)
       {
         for (auto &connection : connections_)
         {
@@ -65,7 +66,8 @@ namespace nodes
             return connection.callback_group;
           }
         }
-        RCLCPP_FATAL(get_logger(), "Subscription for topic '%s' not found!", input_topic.c_str());
+        RCLCPP_FATAL(get_logger(), "Subscription for topic '%s' not found!",
+                     input_topic.c_str());
         std::exit(1);
       }
 
@@ -78,10 +80,65 @@ namespace nodes
         return connections_[1].subscription;
       }
 
+    public:
+      void another_callback()
+      {
+        // std::cout << __FUNCTION__ << std::endl;
+        uint64_t timestamp = now_as_int();
+        message_t msg;
+        rclcpp::MessageInfo msg_info;
+        uint32_t missed_samples = 0;
+        uint32_t id = 0;
+
+        for (auto sub_ptr : subscriptions)
+        {
+          // std::cout << " Checking subscription: " << sub_ptr->get_topic_name() << "\n";
+
+          if (id >= connections_.size())
+          {
+            std::cout << "ERROR " << id << "id >= connections_.size()\n";
+            break;
+          }
+          if (id >= publishers.size())
+          {
+            std::cout << "ERROR " << id << "id >= connections_.size()\n";
+            break;
+          }
+
+          auto number_cruncher_result =
+              number_cruncher(connections_[id].number_crunch_limit);
+          auto output_message = publishers[id]->borrow_loaned_message();
+          output_message.get().size = 0;
+          if (sub_ptr->take(msg, msg_info))
+          {
+
+            message_t::SharedPtr type_erased_msg = std::make_shared<message_t>(msg);
+
+            missed_samples += get_missed_samples_and_update_seq_nr(type_erased_msg, connections_[id].input_sequence_number);
+            merge_history_into_sample(output_message.get(), type_erased_msg);
+
+            set_sample(this->get_name(), connections_[id].sequence_number++,
+                       missed_samples, timestamp, output_message.get());
+            // sub_ptr->handle_message(type_erased_msg2, msg_info);
+          }
+          else
+          {
+            RCLCPP_WARN(this->get_logger(), "   |->No message available %s", sub_ptr->get_topic_name());
+          }
+          // use result so that it is not optimizied away by some clever compiler
+          output_message.get().data[id] = number_cruncher_result;
+          publishers[id]->publish(std::move(output_message));
+          // RCLCPP_WARN(this->get_logger(), "******* Published topic %s",
+          // publishers[id]->get_topic_name());
+          ++id;
+        }
+
+        // std::cout << "~" << __FUNCTION__ << std::endl;
+      }
+
     private:
-      void input_callback(
-          const message_t::SharedPtr input_message,
-          const uint64_t id)
+      void input_callback(const message_t::SharedPtr input_message,
+                          const uint64_t id)
       {
         uint64_t timestamp = now_as_int();
         auto number_cruncher_result =
@@ -94,11 +151,11 @@ namespace nodes
         uint32_t missed_samples = get_missed_samples_and_update_seq_nr(
             input_message, connections_[id].input_sequence_number);
 
-        set_sample(
-            this->get_name(), connections_[id].sequence_number++,
-            missed_samples, timestamp, output_message.get());
+        set_sample(this->get_name(), connections_[id].sequence_number++,
+                   missed_samples, timestamp, output_message.get());
 
-        // use result so that it is not optimizied away by some clever compiler
+        // use result so that it is not optimizied away by some clever
+        // compiler
         output_message.get().data[0] = number_cruncher_result;
         connections_[id].publisher->publish(std::move(output_message));
       }
@@ -114,6 +171,8 @@ namespace nodes
         uint32_t input_sequence_number = 0;
       };
       std::vector<Connection> connections_;
+      VectorSubcriptions subscriptions;
+      VectorPublishers publishers;
     };
   } // namespace rclcpp_system
 } // namespace nodes

@@ -6,8 +6,8 @@
 #ifndef DFS_SEQUENCER_H
 #define DFS_SEQUENCER_H
 
-#include "data_flow_scheduler/data_flow_types.h"
 #include "data_flow_scheduler/data_flow_hashT.h"
+#include "data_flow_scheduler/data_flow_types.h"
 #include "data_flow_scheduler/igraphcreator.h"
 #include "data_flow_scheduler/ipc_server.h"
 
@@ -21,8 +21,7 @@ namespace DFS
      * @brief Constructs a DFSSequencer object with the specified graph creator.
      * @param graph_creator The graph creator object.
      */
-    DFSSequencer(IGraphCreator &graph_creator)
-        : gcreator(graph_creator){};
+    DFSSequencer(IGraphCreator &graph_creator) : gcreator(graph_creator){};
 
     /**
      * @brief Initializes the sequencer with the specified node name.
@@ -38,19 +37,13 @@ namespace DFS
     /**
      * @brief Destructor for the DFSSequencer object.
      */
-    ~DFSSequencer()
-    {
-      std::cout << "[+]Destructor DFSSequencer!\n";
-    };
+    ~DFSSequencer() { std::cout << "[+]Destructor DFSSequencer!\n"; };
 
     /**
      * @brief Signal handler for catching interrupt signals.
      * @param signal The received signal.
      */
-    static void handleSignal(int)
-    {
-      signalReceived = 1;
-    }
+    static void handleSignal(int) { signalReceived = 1; }
 
     /**
      * @brief Sets the signal handler to catch interrupt signals.
@@ -69,10 +62,10 @@ namespace DFS
     DFSHashT hashtables;                         /**< The hash tables for storing execution information. */
     std::string node_name;                       /**< The name of the node. */
     IGraphCreator &gcreator;                     /**< The graph creator object. */
-    DFS_Interface::Execute_Info execute_;        /**< The execution information. */
+    DFSched::ExecutionParams execute_;           /**< The execution information. */
     std::vector<int> ready_list;                 /**< The list of ready callbacks for execution. */
     std::vector<int> executed;                   /**< The list of executed callbacks. */
-    std::vector<int> executed_last;              /**< The list of executed callbacks in the last iteration. */
+    std::vector<int> executed_last;              /**< The list of executed callbacks in the                                       last iteration. */
     std::vector<int> runtime_count;              /**< Counts the runtimes of each iteration. */
     bool first;                                  /**< Indicates whether it is the first iteration. */
     int available_cores = CORES;                 /**< The number of available cores for execution. */
@@ -89,12 +82,12 @@ namespace DFS
     void print_runtime() const;
 
     /**
-     * @brief Checks if all dependent callbacks of a given callback have been executed.
+     * @brief Checks if all dependent callbacks of a given callback have been
+     * executed.
      * @param InArcs The hash table with the incoming arc dependancies.
      * @param OutArcs The hash table with the outgoing arc dependancies.
      */
-    void all_dependet_nodes_executed(std::map<int, std::vector<int>> &,
-                                     std::map<int, std::vector<int>>);
+    void all_dependet_nodes_executed(ArcInfo &, ArcInfo &);
 
     /**
      * @brief Sequencer to handle the created graph.
@@ -105,12 +98,12 @@ namespace DFS
      * @param callback_type The type of the callback function.
      * @param executed_last The list of executed callback in the last iteration.
      * @param mutex_id The ID of the mutex.
+     * @param supervision The kind of timeout supervision
      * @param server The PASServer object.
      */
     void execute_callback(int node_id, int callback_id, int callback_type,
-                          std::vector<int> &executed_last,
-                          int mutex_id, int callback_nodes, int callback_cores,
-                          DFSServer &server);
+                          std::vector<int> &executed_last, int mutex_id,
+                          int callback_nodes, int callback_cores, DFSched::TimeSupervision supervision, DFSServer &server);
   };
 
 } // namespace DFS

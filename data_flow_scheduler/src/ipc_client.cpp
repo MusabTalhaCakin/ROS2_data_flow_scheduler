@@ -5,7 +5,7 @@
 
 #include "data_flow_scheduler/ipc_client.h"
 
-using namespace DFS_Interface;
+using namespace DFSched;
 
 bool DFSClient::connect(const std::string &name_)
 {
@@ -44,31 +44,40 @@ void DFSClient::close_socket()
 bool DFSClient::send_data(const std::string &data)
 {
   // Copy the data into the buffer and send it
-  strcpy(buffer, data.c_str());
+  strncpy(buffer, data.c_str(), sizeof(buffer));
   auto n = write(sock, buffer, strlen(buffer) + 1);
   if (n == -1)
   {
-    RCLCPP_ERROR(rclcpp::get_logger(node_name), "Something went wrong sending activity\n");
+    RCLCPP_ERROR(rclcpp::get_logger(node_name),
+                 "Something went wrong sending activity\n");
     return false;
   }
 
-  RCLCPP_INFO(rclcpp::get_logger(node_name), "Send Activity info to DFS.\n");
+  // RCLCPP_INFO(rclcpp::get_logger(node_name), "Send Activity info to DFS.\n");
 
   return true;
 }
 
-bool DFSClient::send_raw_data(const void *data,
-                              std::uint32_t data_size) const
+bool DFSClient::send_raw_data(const void *data, std::uint32_t data_size) const
 {
   // Send raw data over the socket
   auto ret = write(sock, data, data_size);
   return ret != -1;
 }
 
-int DFSClient::read_raw_data(void *data,
-                             std::uint32_t data_size) const
+int DFSClient::read_raw_data(void *data, std::uint32_t data_size) const
 {
   // Read raw data from the socket
   auto ret = read(sock, data, data_size);
+
+  if (ret == -1)
+  {
+    RCLCPP_ERROR(rclcpp::get_logger(node_name), "Server DISCONNECTED!");
+  }
+  // std::string strdata((const char *)data);
+  //  RCLCPP_INFO(rclcpp::get_logger(node_name),
+  //              "READED: '%s' total bytes: %d expected %d", strdata.c_str(),
+  //              ret, data_size);
+
   return ret;
 }
